@@ -1,0 +1,25 @@
+{
+  "name": "home_cam_detection",
+  "version": "1.0.0",
+  "description": "Motion detection by a video cam and notification user",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saratoga8/home_cam_detection.git"
+  },
+  "devDependencies": {
+    "js-yaml": "^3.14.0"
+  },
+  "keywords": [
+    "video_detection"
+  ],
+  "author": "Daniel Haimov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/saratoga8/home_cam_detection/issues"
+  },
+  "homepage": "https://github.com/saratoga8/home_cam_detection#readme"
+}
