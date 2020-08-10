@@ -4,14 +4,22 @@
   "description": "Motion detection by a video cam and notification user",
   "main": "src/main.js",
   "scripts": {
-    "test": "test"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/saratoga8/home_cam_detection.git"
   },
+  "dependencies": {
+    "js-yaml": "^3.14.0",
+    "process": "^0.11.10"
+  },
   "devDependencies": {
-    "js-yaml": "^3.14.0"
+    "eslint": "^7.6.0",
+    "mocha": "^8.1.1"
+  },
+  "engines": {
+    "node": ">=12.0.0"
   },
   "keywords": [
     "video_detection"

@@ -1,22 +1,32 @@
 const yaml = require('js-yaml')
 const fs = require('fs')
-const { exec } = require('child_process')
+const { spawn, spawnSync } = require('child_process')
 
 const config_path = 'resources/motion.yml'
+let childProcess
+
+function hasInstalled() {
+  const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
+  const proc = spawnSync(conf.paths.motion, ['-h'])
+  if(proc.error)
+    return false
+  return true
+}
 
 function start () {
   try {
     const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
-    const childProcess = exec(conf.paths.motion, (error, stdout, stderr) => {
-      if (error) {
-        throw error;
-      }
-      console.log(stdout);
-    })
-    childProcess.kill("SIGQUIT")
+    childProcess = spawn(conf.paths.motion, ['-b'])
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 
+function stop() {
+  if(childProcess)
+    childProcess.kill("SIGQUIT")
+}
+
 exports.start = start
+exports.stop = stop
+exports.hasInstalled = hasInstalled
