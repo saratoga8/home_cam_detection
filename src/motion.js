@@ -8,9 +8,7 @@ let childProcess
 function hasInstalled() {
   const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
   const proc = spawnSync(conf.paths.motion, ['-h'])
-  if(proc.error)
-    return false
-  return true
+  return (!proc.error)
 }
 
 function start () {
