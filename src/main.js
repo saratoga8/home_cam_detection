@@ -1,2 +1,10 @@
 const motion = require('./motion')
-motion.start()
+const process = require('process');
+
+
+if(motion.hasInstalled()) {
+    motion.start()
+    motion.stop()
+}
+else
+    process.exit(9)
