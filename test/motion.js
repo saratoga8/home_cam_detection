@@ -7,18 +7,19 @@ const assert = require('chai').assert
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 const motionPath = conf.paths.motion
 
-describe('Motion use', () => {
-    beforeEach(async () => {
-        await exec('killall motion', (err) => {
-            if (err) return
-        })
-    })
+const isRunning = () => {
+    return execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
+}
 
-    after(async () => {
-        await exec('killall motion', (err) => {
-            if (err) return
-        })
+const killMotion = async () => {
+    await exec('killall motion', (err) => {
+        if (err) return
     })
+}
+
+describe('Motion use', () => {
+    after(killMotion)
+    beforeEach(killMotion)
 
     it("Motion hasn't installed", async () => {
         conf.paths.motion = "/bla/bla"
@@ -30,21 +31,17 @@ describe('Motion use', () => {
     })
 
     it("Motion starting", async () => {
-        let found = execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
-        assert.equal(found, undefined, "Shouldn't be running any instance of Motion before testing")
+        assert.equal(isRunning(), undefined, "Shouldn't be running any instance of Motion before testing")
         motion.start()
-        found = execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
-        assert.notEqual(found, undefined, "Running Motion hasn't found")
+        assert.notEqual(isRunning(), undefined, "Running Motion hasn't found")
     })
 
     it("Motion stopping", () => {
         motion.start()
-        let found = execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
-        assert.notEqual(found, undefined, "Running Motion hasn't found")
+        assert.notEqual(isRunning(), undefined, "Running Motion hasn't found")
         motion.stop()
         setTimeout(() => {
-            found = execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
-            assert.equal(found, undefined, "Motion is still running")
+            assert.equal(isRunning(), undefined, "Motion is still running")
         }, 3)
     })
 })

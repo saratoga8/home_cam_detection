@@ -17,14 +17,17 @@ function start () {
   try {
     const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
     childProcess = spawn(conf.paths.motion, ['-b'])
+    console.log("Starting motion")
   } catch (e) {
     console.error(e)
   }
 }
 
 function stop() {
-  if(childProcess)
+  if(childProcess) {
     childProcess.kill("SIGQUIT")
+    console.log("Stopping motion")
+  }
 }
 
 exports.start = start
