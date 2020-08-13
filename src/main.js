@@ -8,4 +8,3 @@ if(motion.hasInstalled()) {
 }
 else
     process.exit(9)
-
