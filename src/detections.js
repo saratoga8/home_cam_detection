@@ -16,10 +16,7 @@ let count = 0
 function start() {
     fs.watch(dirPath, {persistent: false}, (event, file) => {
         if ((event === 'change') && (file.endsWith(`.${imgExt}`))) {
-            if (count > newImgsTrashHold) {
-                count = 0
-            }
-                count++
+            count = (count > newImgsTrashHold) ? 0 : count + 1
         }
     })
 }

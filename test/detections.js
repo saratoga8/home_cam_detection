@@ -24,9 +24,10 @@ describe('Detections use', () => {
         const newFiles = maxSavedImgs + 5
         execSync("for i in `seq " + newFiles + "`; do touch \"" + conf.paths.detections_dir + "/file$i.jpg\"; done")
         detections.cleanDir()
-        exec(`ls ${conf.paths.detections_dir}/*.jpg | wc -l`, (err, stdout, stderr) => {
+        exec(`ls ${conf.paths.detections_dir}/*.jpg | wc -l`, (err, stdout) => {
+            execSync(`rm ${conf.paths.detections_dir}/*.jpg`)
             if(stdout) assert.equal(stdout, maxSavedImgs, "Invalid number of saved detection images")
+            if(err) assert.fail(`Test aborted: ${err.message}`)
         })
-        execSync(`rm ${conf.paths.detections_dir}/*.jpg`)
       })
 })
