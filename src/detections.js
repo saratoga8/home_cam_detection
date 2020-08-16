@@ -14,7 +14,7 @@ const newImgsTrashHold = conf.new_imgs_threshold
 let count = 0
 
 function start() {
-    fs.watch(dirPath, {persistent: false}, (event, files) => {
+    fs.watch(dirPath, {persistent: false}, (event, file) => {
         if ((event === 'change') && (file.endsWith(`.${imgExt}`))) {
             if (count > newImgsTrashHold) {
                 count = 0
