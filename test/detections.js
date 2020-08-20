@@ -13,6 +13,7 @@ const maxSavedImgs = conf.max_saved_imgs
 const detectionsDirPath = conf.paths.detections_dir
 const newImgsTrashHold = conf.new_imgs_threshold
 const { emitter } = require('../src/main')
+const add_files = (path, num) => { execSync("for i in `seq " + num + "`; do touch \"" + path + "/file$i.jpg\"; done") }
 
 describe('Detections use', async () => {
     it('start detecting', async () => {
@@ -20,13 +21,13 @@ describe('Detections use', async () => {
         detections.start()
         let p = emitter.should.emit(detections.eventStr);
         const imgsNum = newImgsTrashHold + 2
-        execSync("for i in `seq " + imgsNum + "`; do touch \"" + detectionsDirPath + "/file$i.jpg\"; done")
+        add_files(detectionsDirPath, imgsNum)
         return p
     })
 
     it('clean old images', () => {
         const newFiles = maxSavedImgs + 5
-        execSync("for i in `seq " + newFiles + "`; do touch \"" + detectionsDirPath + "/file$i.jpg\"; done")
+        add_files(detectionsDirPath, newFiles)
         detections.cleanDir()
         exec(`ls ${detectionsDirPath}/*.jpg | wc -l`, (err, stdout, stderr) => {
             if(stdout) assert.equal(stdout, maxSavedImgs, "Invalid number of saved detection images")

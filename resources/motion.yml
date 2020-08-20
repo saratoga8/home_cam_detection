@@ -1,7 +1,7 @@
 paths:
   motion: /usr/bin/motion
-  conf_dir: /home/daniel/.motion
-  detections_dir: /home/daniel/.motion/detections
+  conf_dir: /home/saratoga/.motion
+  detections_dir: /home/saratoga/.motion/detections
 extensions:
   img: jpg
   video: avi
