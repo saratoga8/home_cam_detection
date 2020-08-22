@@ -1,7 +1,6 @@
 const yaml = require('js-yaml')
 const fs = require('fs')
 const { sep } = require('path')
-const { emitter } = require('./main')
 
 const config_path = 'resources/motion.yml'
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
@@ -15,7 +14,7 @@ const eventStr = 'detected_motion'
 
 let count = 0
 
-function start() {
+function start(emitter) {
     fs.watch(dirPath, {persistent: false}, (event, file) => {
         if ((event === 'change') && (file.endsWith(`.${imgExt}`))) {
             if (count > newImgsTrashHold) {
