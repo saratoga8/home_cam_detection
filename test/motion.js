@@ -42,6 +42,24 @@ describe('Motion use', () => {
         motion.stop()
         setTimeout(() => {
             assert.equal(isRunning(), undefined, "Motion is still running")
-        }, 3)
+        }, 1000)
+    })
+
+    it("Motion re-start", () => {
+        motion.start()
+        assert.notEqual(isRunning(), undefined, "Running Motion hasn't found")
+        motion.stop()
+        setTimeout(() => {
+            assert.equal(isRunning(), undefined, "Motion is still running")
+        }, 1000)
+        motion.start()
+        assert.notEqual(isRunning(), undefined, "Running Motion hasn't restarted")
+        motion.stop()
+        setTimeout(() => {
+            assert.equal(isRunning(), undefined, "Motion hasn't stopped after re-start")
+        }, 1000)
     })
 })
+
+exports.killMotion = killMotion()
+exports.isRunning = isRunning()

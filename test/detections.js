@@ -34,5 +34,5 @@ describe('Detections use', async () => {
             if(stdout) assert.equal(stdout, maxSavedImgs, "Invalid number of saved detection images")
         })
         execSync(`rm ${detectionsDirPath}/*.jpg`)
-      })
+    })
 })
