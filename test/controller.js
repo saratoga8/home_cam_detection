@@ -5,7 +5,7 @@ const EventEmitter = require("events")
 const {execSync, exec} = require('child_process')
 
 const isRunning = () => {
-    return execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
+    return execSync('ps -e').toString().split('\n').find(str => str.includes("motion")) === undefined
 }
 
 const killMotion = async () => {
@@ -14,17 +14,30 @@ const killMotion = async () => {
     })
 }
 
+function waitUntil(timeoutSec, sleepMs = 100, msg, callback) {
+    return new Promise((resolve) => {
+//        const timesNum = timeoutSec * 1000 / sleepMs
+//        for(let i = 0; i < timesNum; ++i) {
+            setTimeout(() => {
+                callback()
+                resolve(true)
+            }, sleepMs)
+//        }
+    })
+}
 
-describe('Controller', async () => {
-   after(killMotion)
-   beforeEach(killMotion)
+describe('Controller', () => {
+   after(() => { killMotion() })
+   beforeEach('Kill motion', () => { killMotion() } )
 
-    it('Controller stops motion', async () => {
+    it('Controller stops motion', (done) => {
         motion.start()
         assert.notEqual(isRunning(), undefined, "Running Motion hasn't found")
         const emitter = new EventEmitter()
         controller.run(emitter)
         emitter.emit("command", { name: controller.stopMotionCmdName} )
-        setTimeout(assert.equal(isRunning(), undefined, "Running Motion hasn't stopped"), 3000)
+        waitUntil(20, 100, "Running Motion hasn't stopped", () => {
+            console.log("test")
+        }).then(  success => console.log(success) )
     })
 })
