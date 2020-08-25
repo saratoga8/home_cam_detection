@@ -61,5 +61,5 @@ describe('Motion use', () => {
     })
 })
 
-exports.killMotion = killMotion()
-exports.isRunning = isRunning()
+exports.killMotion = killMotion
+exports.isRunning = isRunning
