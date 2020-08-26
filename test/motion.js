@@ -7,13 +7,11 @@ const assert = require('chai').assert
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 const motionPath = conf.paths.motion
 
-const isRunning = () => {
-    return execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
-}
+const isRunning = () => execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
 
 const killMotion = async () => {
-    await exec('killall motion', (err) => {
-        if (err) return
+    await exec('killall motion', err => {
+        if (err) console.error(`Can't kill motion: ${err}`)
     })
 }
 
