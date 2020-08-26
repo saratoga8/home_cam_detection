@@ -11,10 +11,21 @@ describe('Controller', () => {
 
     it('Controller stops motion', () => {
         motion.start()
-        assert.notEqual(isRunning(), undefined, "Running Motion hasn't found")
+        assert.isTrue(isRunning(), "Running Motion isn't running")
         const emitter = new EventEmitter()
         controller.run(emitter)
         emitter.emit("command", { name: controller.stopMotionCmdName} )
-        testUtils.waitUntil(1, 100, isRunning()).then ( result => assert.isTrue(result, "Running Motion hasn't stopped") )
+        testUtils.waitUntil(1, 100, () => { !isRunning() })
+            .then( result => assert.isTrue(result, "Running Motion hasn't stopped") )
+    })
+
+    it('Controller start motion', () => {
+        testUtils.waitUntil(1, 100, () => { !isRunning() })
+            .then( result => assert.isTrue(result, "Running Motion hasn't stopped") )
+//        assert.isFalse(isRunning(), "Running Motion hasn't stopped")
+        const emitter = new EventEmitter()
+        controller.run(emitter)
+        emitter.emit("command", { name: controller.startMotionCmdName} )
+        testUtils.waitUntil(2, 100, isRunning()).then ( result => assert.isTrue(result, "Running Motion hasn't started") )
     })
 })

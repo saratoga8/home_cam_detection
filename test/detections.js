@@ -31,7 +31,7 @@ describe('Detections use', async () => {
         add_files(detectionsDirPath, newFiles)
         detections.cleanDir()
         exec(`ls ${detectionsDirPath}/*.jpg | wc -l`, (err, stdout, stderr) => {
-            if(stdout) assert.equal(stdout, maxSavedImgs, "Invalid number of saved detection images")
+            if(stdout) assert.equal(parseInt(stdout), maxSavedImgs, "Invalid number of saved detection images")
         })
         execSync(`rm ${detectionsDirPath}/*.jpg`)
     })

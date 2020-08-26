@@ -6,13 +6,18 @@ const {execSync, exec} = require('child_process')
 const assert = require('chai').assert
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 const motionPath = conf.paths.motion
+const testUtils = require('./utils')
 
-const isRunning = () => execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
+const isRunning = () => {
+    const result = execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
+    return result !== undefined
+}
 
-const killMotion = async () => {
-    await exec('killall motion', err => {
-        if (err) console.error(`Can't kill motion: ${err}`)
-    })
+const killMotion = () => {
+    try {
+        execSync('killall motion')
+    } catch (e) {
+        console.error("Can't kill motion")}
 }
 
 describe('Motion use', () => {
@@ -29,33 +34,31 @@ describe('Motion use', () => {
     })
 
     it("Motion starting", async () => {
-        assert.equal(isRunning(), undefined, "Shouldn't be running any instance of Motion before testing")
+        testUtils.waitUntil(2, 100, () => { !isRunning() })
+            .then( result => assert.isTrue(result, "Running Motion hasn't stopped") )
         motion.start()
-        assert.notEqual(isRunning(), undefined, "Running Motion hasn't found")
+        assert.isTrue(isRunning(), "Running Motion hasn't started")
     })
 
     it("Motion stopping", () => {
         motion.start()
-        assert.notEqual(isRunning(), undefined, "Running Motion hasn't found")
+        assert.isTrue(isRunning(), "Running Motion hasn't started")
         motion.stop()
-        setTimeout(() => {
-            assert.equal(isRunning(), undefined, "Motion is still running")
-        }, 1000)
+        testUtils.waitUntil(2, 100, () => { !isRunning() })
+            .then( result => assert.isTrue(result, "Running Motion hasn't stopped") )
     })
 
     it("Motion re-start", () => {
         motion.start()
-        assert.notEqual(isRunning(), undefined, "Running Motion hasn't found")
+        assert.isTrue(isRunning(), "Running Motion hasn't started")
         motion.stop()
-        setTimeout(() => {
-            assert.equal(isRunning(), undefined, "Motion is still running")
-        }, 1000)
+        testUtils.waitUntil(2, 100, () => { !isRunning() })
+            .then( result => assert.isTrue(result, "Running Motion hasn't stopped") )
         motion.start()
-        assert.notEqual(isRunning(), undefined, "Running Motion hasn't restarted")
+        assert.isTrue(isRunning(), "Running Motion hasn't re-started")
         motion.stop()
-        setTimeout(() => {
-            assert.equal(isRunning(), undefined, "Motion hasn't stopped after re-start")
-        }, 1000)
+        testUtils.waitUntil(2, 100, () => { !isRunning() })
+            .then( result => assert.isTrue(result, "Running Motion hasn't stopped") )
     })
 })
 
