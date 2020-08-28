@@ -37,18 +37,22 @@ describe('Motion use', () => {
         testUtils.waitUntil(2, 100, () => { !isRunning() })
             .then( result => assert.isTrue(result, "Running Motion hasn't stopped") )
         motion.start()
-        assert.isTrue(isRunning(), "Running Motion hasn't started")
+        assert.isTrue(isRunning(), "Motion hasn't started")
     })
 
     it("Motion stopping", () => {
-        motion.start()
-        assert.isTrue(isRunning(), "Running Motion hasn't started")
-        motion.stop()
         testUtils.waitUntil(2, 100, () => { !isRunning() })
             .then( result => assert.isTrue(result, "Running Motion hasn't stopped") )
-    })
+        motion.start()
+        assert.isTrue(isRunning(), "Running Motion hasn't started")
+        setTimeout(motion.stop, 8000)
+        testUtils.waitUntil(2, 100, () => { !isRunning() })
+            .then( result => assert.isTrue(result, "Running Motion hasn't stopped") )
+    }).timeout(10000)
 
     it("Motion re-start", () => {
+        testUtils.waitUntil(2, 100, () => { !isRunning() })
+            .then( result => assert.isTrue(result, "Running Motion hasn't stopped") )
         motion.start()
         assert.isTrue(isRunning(), "Running Motion hasn't started")
         motion.stop()
