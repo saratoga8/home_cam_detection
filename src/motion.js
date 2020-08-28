@@ -19,7 +19,7 @@ function hasInstalled() {
 function start () {
   try {
     const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
-    childProcess = spawn(conf.paths.motion, ['-b'])
+    childProcess = spawn(conf.paths.motion, ['-bm'])
     console.log("Starting motion")
   } catch (e) {
     console.error(e)
@@ -28,7 +28,7 @@ function start () {
 
 function stop() {
   if(childProcess) {
-    childProcess.kill("SIGQUIT")
+    childProcess.kill("SIGTERM")
     console.log("Stopping motion")
   }
 }
