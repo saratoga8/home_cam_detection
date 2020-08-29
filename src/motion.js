@@ -19,7 +19,7 @@ function hasInstalled() {
 function start () {
   try {
     const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
-    childProcess = spawn(conf.paths.motion, ['-bm'])
+    childProcess = spawn(conf.paths.motion, ['-m'])
     console.log("Starting motion")
   } catch (e) {
     console.error(e)

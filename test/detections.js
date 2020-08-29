@@ -27,12 +27,12 @@ describe('Detections use', async () => {
     })
 
     it('clean old images', () => {
-        const newFiles = maxSavedImgs + 5
+        const newFiles = parseInt(maxSavedImgs + 5)
         add_files(detectionsDirPath, newFiles)
+        const imgsNumStr = () => { return execSync(`ls ${detectionsDirPath}/*.jpg | wc -l`).toString() }
+        assert.isAtLeast(parseInt(imgsNumStr()), newFiles, "There is not enough added images")
         detections.cleanDir()
-        exec(`ls ${detectionsDirPath}/*.jpg | wc -l`, (err, stdout, stderr) => {
-            if(stdout) assert.equal(parseInt(stdout), maxSavedImgs, "Invalid number of saved detection images")
-        })
+        assert.equal(parseInt(imgsNumStr()), maxSavedImgs, "Invalid number of saved detection images")
         execSync(`rm ${detectionsDirPath}/*.jpg`)
     })
 })

@@ -5,5 +5,6 @@ paths:
 extensions:
   img: jpg
   video: avi
-max_saved_imgs: 100
+max_saved_imgs: 10
+max_saved_videos: 1
 new_imgs_threshold: 15
