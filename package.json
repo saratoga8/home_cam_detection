@@ -4,7 +4,8 @@
   "description": "Motion detection by a video cam and notification user",
   "main": "src/main.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "automation": "./node_modules/.bin/cucumber-js -f progress features"
   },
   "repository": {
     "type": "git",
@@ -20,7 +21,8 @@
     "mocha": "^8.1.1",
     "chai": "^4.2.0",
     "chai-events": "^0.0.3",
-    "sleep": "^6.3.0"
+    "sleep": "^6.3.0",
+    "cucumber": "^6.0.5"
   },
   "engines": {
     "node": ">=12.0.0"
