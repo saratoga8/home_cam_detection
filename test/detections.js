@@ -1,5 +1,5 @@
 const detections = require('../src/detections')
-const {execSync, exec} = require('child_process')
+const {execSync} = require('child_process')
 const fs = require('fs')
 const yaml = require('js-yaml')
 const chai = require('chai')
