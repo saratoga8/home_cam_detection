@@ -1,8 +1,9 @@
 const motion = require('./motion')
 const commands = {
     stopMotion: {
-        command_name: "stop_motion", exec: () => {
+        command_name: "stop_motion", exec: (output = null) => {
             motion.stop()
+            if(output != null) output.send('OK')
         }
     },
     startMotion: {

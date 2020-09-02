@@ -23,7 +23,6 @@ describe('Controller', () => {
     it('Controller start motion', () => {
         testUtils.waitUntil(1, 100, () => { !isRunning() })
             .then( result => assert.isTrue(result, "Running Motion hasn't stopped") )
-//        assert.isFalse(isRunning(), "Running Motion hasn't stopped")
         const emitter = new EventEmitter()
         controller.run(emitter)
         emitter.emit("command", { name: commands.startMotion.command_name} )
