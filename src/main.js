@@ -1,9 +1,13 @@
 const motion = require('./motion')
 const process = require('process');
 const fs = require('fs')
+const controller = require('./controller')
 
 const args = require('yargs').argv
 const pid_path = args.pid_path
+
+const EventEmitter = require("events")
+const ios = require('./ios/cli')
 
 process.on('SIGTERM', () => {
     motion.stop()
@@ -18,6 +22,8 @@ if(motion.hasInstalled()) {
         }
     })
     motion.start()
+    controller.run(new EventEmitter(), ios)
+    ios.io.in.receive()
     setInterval(() => {}, 100)
 }
 else
