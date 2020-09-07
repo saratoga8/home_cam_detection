@@ -14,11 +14,15 @@ const eventStr = 'detected_motion'
 
 let count = 0
 
+function paths(fileExtension) {
+    return fs.readdirSync(dirPath).filter(file => extname(file).slice(1) == fileExtension).map(file => dirPath.concat(sep, file))
+}
+
 function start(emitter) {
     fs.watch(dirPath, {persistent: false}, (event, file) => {
         if ((event === 'change') && (file.endsWith(`.${imgExt}`))) {
             if (count > newImgsTrashHold) {
-                emitter.emit(eventStr)
+                emitter.emit(eventStr, paths(imgExt))
                 count = 0
             } else count++
         }
@@ -30,9 +34,9 @@ function cleanDir() {
     delFiles(videoExt, conf.max_saved_videos)
 }
 
+
 function delFiles(fileExtension, maxSavedFiles) {
-    const paths = fs.readdirSync(dirPath).filter(file => extname(file).slice(1) == fileExtension).map(file => dirPath.concat(sep, file))
-    const sorted = paths.sort((path1, path2) => {
+    const sorted = paths(fileExtension).sort((path1, path2) => {
         return fs.statSync(path1).birthtimeMs - fs.statSync(path2).birthtimeMs
     })
     const del_elements_num = sorted.length - maxSavedFiles

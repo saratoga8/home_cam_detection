@@ -1,9 +1,11 @@
+const commands = require('../commands')
+
 exports.io = {
     out: {
         send: (str) => { console.log(str) }
     },
     in: {
-        receive: () => {
+        receive: (emitter) => {
             const readline = require('readline');
             const rl = readline.createInterface({
                 input: process.stdin,
@@ -14,16 +16,15 @@ exports.io = {
 
             rl.on('line', (line) => {
                 switch (line.trim()) {
-                    case 'hello':
-                        console.log('world!');
+                    case 'stop':
+                        emitter.emit("command", { name: commands.stopMotion.command_name} )
                         break;
-                    default:
-                        console.log(`Say what? I might have heard '${line.trim()}'`);
+                    case 'start':
+                        emitter.emit("command", { name: commands.startMotion.command_name} )
                         break;
                 }
 //                rl.prompt();
             }).on('close', () => {
-                console.log('Have a great day!');
                 process.exit(0);
             });
         }

@@ -6,12 +6,12 @@ function waitUntil(timeoutSec, sleepMs = 100, callback) {
         let result = false
         for (let i = 0; i < maxNum; ++i) {
             sleep.msleep(sleepMs)
-            if (callback) {
+            if (callback()) {
                 result = true
                 break
             }
         }
-        resolve(result)
+        result ? resolve(result) : reject(result)
     })
 }
 

@@ -2,9 +2,8 @@ const yaml = require('js-yaml')
 const fs = require('fs')
 const { spawn, spawnSync } = require('child_process')
 
-
 const config_path = 'resources/motion.yml'
-let childProcess
+let childProcess = null
 
 
 
@@ -18,9 +17,12 @@ function hasInstalled() {
 
 function start () {
   try {
-    const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
-    childProcess = spawn(conf.paths.motion, ['-m'])
-    console.log("Starting motion")  // TODO Should be added checking of stopping
+    if(childProcess == null) {
+      const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
+      childProcess = spawn(conf.paths.motion, [])
+      console.log("Starting motion")  // TODO Should be added checking of stopping
+    }
+    else console.error("Can't start another motion instance. Stop the current one before")
   } catch (e) {
     console.error(e)
   }
@@ -29,6 +31,7 @@ function start () {
 function stop() {
   if(childProcess) {
     childProcess.kill("SIGTERM")
+    childProcess = null
     console.log("Stopping motion") // TODO Should be added checking of stopping
   }
 }
