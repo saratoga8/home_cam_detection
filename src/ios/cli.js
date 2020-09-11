@@ -2,7 +2,9 @@ const commands = require('../commands')
 
 exports.io = {
     out: {
-        send: (str) => { console.log(str) }
+        send: (str) => {
+            console.log(str)
+        }
     },
     in: {
         receive: (emitter) => {

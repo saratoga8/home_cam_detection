@@ -1,20 +1,15 @@
 const detections = require('../src/detections')
 const {execSync} = require('child_process')
 const fs = require('fs')
-const yaml = require('js-yaml')
+
 const chai = require('chai')
 const assert = chai.assert
 const should = chai.should()
 chai.use(require("chai-events"));
 const EventEmitter = require("events");
 
-const config_path = 'resources/motion.yml'
-const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
-const maxSavedImgs = conf.max_saved_imgs
-const detectionsDirPath = conf.paths.detections_dir
-const newImgsTrashHold = conf.new_imgs_threshold
-const add_files = (path, num) => { execSync("for i in `seq " + num + "`; do touch \"" + path + "/file$i.jpg\"; done") }
 const emitter = new EventEmitter()
+const {add_files, maxSavedImgs, detectionsDirPath, newImgsTrashHold} = require('./utils')
 
 describe('Detections use', async () => {
     it('start detecting', async () => {
