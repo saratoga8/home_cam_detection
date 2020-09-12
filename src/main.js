@@ -12,6 +12,7 @@ const io = require('./ios/io')
 
 process.on('SIGTERM', () => {
     motion.stop()
+    console.log("Exiting")
     process.exit()
 })
 

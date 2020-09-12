@@ -9,10 +9,7 @@ exports.io = {
     in: {
         receive: (emitter) => {
             const readline = require('readline');
-            const rl = readline.createInterface({
-                input: process.stdin,
-                output: process.stdout,
-            });
+            const rl = readline.createInterface({ input: process.stdin });
 
 //            rl.prompt();
 

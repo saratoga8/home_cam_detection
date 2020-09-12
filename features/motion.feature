@@ -1,14 +1,16 @@
 Feature: Motion detecting by program
 
-  @dev
   Scenario: User starts motions detecting
     Given There are no detections in directory
-    When User starts motion detecting by program
-    And Some motion occurs for time more than threshold
+    When User starts program
+    And Some motion occurs for some time more than threshold
     Then Program DOES detect motion
 
+  @dev
   Scenario: User stops motion detecting
-    When User stops motion detecting by program
+    Given There are no detections in directory
+    When User starts program
+    And User stops motion detecting by program
     And Some motion occurs for some time less than threshold
     Then Program DOESN'T detect motion
 
