@@ -5,14 +5,20 @@ const { sep, extname } = require('path')
 const config_path = 'resources/motion.yml'
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 const dirPath = conf.paths.detections_dir
-const newImgsTrashHold = conf.new_imgs_threshold
 const imgExt = conf.extensions.img
 const videoExt = conf.extensions.video
 const eventStr = 'detected_motion'
 
 
+const newImgsTrashHold = () => {
+    const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
+    return conf.new_imgs_threshold
+}
 
 let count = 0
+const toNowMinutes = () => new Date(Date.now()).getMinutes()
+let lastDetectionDate = toNowMinutes()
+const minTimeBetweenDetectionsMinutes = 1
 
 function paths(fileExtension) {
     return fs.readdirSync(dirPath).filter(file => extname(file).slice(1) == fileExtension).map(file => dirPath.concat(sep, file))
@@ -21,7 +27,11 @@ function paths(fileExtension) {
 function start(emitter) {
     fs.watch(dirPath, {persistent: false}, (event, file) => {
         if ((event === 'change') && (file.endsWith(`.${imgExt}`))) {
-            if (count > newImgsTrashHold) {
+            if((toNowMinutes() - lastDetectionDate) > minTimeBetweenDetectionsMinutes) {
+                count = 0
+                lastDetectionDate = toNowMinutes()
+            }
+            if (count > newImgsTrashHold()) {
                 emitter.emit(eventStr, paths(imgExt))
                 count = 0
             } else count++

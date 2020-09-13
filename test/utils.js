@@ -23,7 +23,7 @@ const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 
 exports.maxSavedImgs = conf.max_saved_imgs
 exports.detectionsDirPath = conf.paths.detections_dir
-exports.newImgsTrashHold = conf.new_imgs_threshold
+exports.newImgsTrashHold = () => yaml.safeLoad(fs.readFileSync(config_path, 'utf8')).new_imgs_threshold
 
 exports.add_files = (path, num) => { execSync("for i in `seq " + num + "`; do touch \"" + path + "/file$i.jpg\"; done") }
 exports.waitUntil = waitUntil

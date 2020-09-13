@@ -1,29 +1,37 @@
 Feature: Motion detecting by program
 
-  Scenario: User starts motions detecting
+  Scenario Outline: User starts motions detecting
     Given There are no detections in directory
     When User starts program
-    And Some motion occurs for some time more than threshold
-    Then Program DOES detect motion
+    And There are detections with number <sign> than threshold
+    Then Program <action> detect motion
 
-  @dev
+    Examples:
+      | action  | sign |
+      | DOES    | more |
+      | DOESN'T | less |
+
   Scenario: User stops motion detecting
     Given There are no detections in directory
     When User starts program
     And User stops motion detecting by program
-    And Some motion occurs for some time less than threshold
     Then Program DOESN'T detect motion
 
-  Scenario:  User increase detection threshold
-    When User increases detection threshold
-    And User starts motion detecting by program
-    And Some motion occurs for some time less than threshold
-    Then Program DOESN'T detect motion
-    When Some motion occurs for time more than threshold
+  Scenario:  User changes detection threshold
+    Given There are no detections in directory
+    When User starts program
+    And There are detections with number more than threshold
+    And Program DOES detect motion
+    And User increases detection threshold
+    And There are detections with number more than threshold
     Then Program DOES detect motion
 
   Scenario: Detection periods don't depend on each other
-    When User starts motion detecting by program
-    And Some motion occurs for some time less than threshold
-    And Some motion occurs for some time less than threshold
+    Given There are no detections in directory
+    When User starts program
+    And There are detections with number less than threshold
+    Then Program DOESN'T detect motion
+    When There are detections with number less than threshold
+    Then Program DOESN'T detect motion
+    When There are detections with number less than threshold
     Then Program DOES detect motion
