@@ -7,18 +7,18 @@ const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 const dirPath = conf.paths.detections_dir
 const imgExt = conf.extensions.img
 const videoExt = conf.extensions.video
+const minTimeBetweenDetectionsSeconds = conf.seconds_between_detections
 const eventStr = 'detected_motion'
 
 
-const newImgsTrashHold = () => {
+const newImgsThreshold = () => {
     const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
-    return conf.new_imgs_threshold
+    return (conf === undefined) ? undefined : conf.new_imgs_threshold
 }
 
 let count = 0
-const toNowMinutes = () => new Date(Date.now()).getMinutes()
-let lastDetectionDate = toNowMinutes()
-const minTimeBetweenDetectionsMinutes = 1
+const toNowSeconds = () => new Date(Date.now()).getSeconds()
+let lastDetectionDate = toNowSeconds()
 
 function paths(fileExtension) {
     return fs.readdirSync(dirPath).filter(file => extname(file).slice(1) == fileExtension).map(file => dirPath.concat(sep, file))
@@ -26,12 +26,13 @@ function paths(fileExtension) {
 
 function start(emitter) {
     fs.watch(dirPath, {persistent: false}, (event, file) => {
-        if ((event === 'change') && (file.endsWith(`.${imgExt}`))) {
-            if((toNowMinutes() - lastDetectionDate) > minTimeBetweenDetectionsMinutes) {
+        if (file.endsWith(`.${imgExt}`)) {
+            if((toNowSeconds() - lastDetectionDate) > minTimeBetweenDetectionsSeconds) {
                 count = 0
-                lastDetectionDate = toNowMinutes()
+                lastDetectionDate = toNowSeconds()
             }
-            if (count > newImgsTrashHold()) {
+            const threshold = newImgsThreshold()
+            if ((threshold !== undefined) && (count > threshold)) {
                 emitter.emit(eventStr, paths(imgExt))
                 count = 0
             } else count++

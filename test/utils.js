@@ -2,6 +2,7 @@ const sleep = require('sleep')
 const {execSync} = require('child_process')
 const yaml = require('js-yaml')
 const fs = require('fs')
+const {sep} = require('path')
 
 function waitUntil(timeoutSec, sleepMs = 100, callback) {
     return new Promise((resolve, reject) => {
@@ -25,5 +26,10 @@ exports.maxSavedImgs = conf.max_saved_imgs
 exports.detectionsDirPath = conf.paths.detections_dir
 exports.newImgsTrashHold = () => yaml.safeLoad(fs.readFileSync(config_path, 'utf8')).new_imgs_threshold
 
-exports.add_files = (path, num) => { execSync("for i in `seq " + num + "`; do touch \"" + path + "/file$i.jpg\"; done") }
+exports.add_files = (path, num) => {
+    for(let i = 0; i < num; i++) {
+        const imgPath = `${path}${sep}file${Math.floor(Math.random() * 1000)}.jpg`
+        fs.writeFileSync(imgPath, "", {flag: 'w'})
+    }
+}
 exports.waitUntil = waitUntil

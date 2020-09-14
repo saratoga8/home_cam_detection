@@ -30,14 +30,6 @@ const killMotion = () => {
         console.error("Can't kill motion")}
 }
 
-let counter = 0
-
-function giveFalse() {
-    console.log("bla")
-    counter += 1
-    return false
-}
-
 describe('Motion use', () => {
     after(killMotion)
     beforeEach(killMotion)
@@ -75,11 +67,6 @@ describe('Motion use', () => {
         assert.isTrue(isRunning(), "Running Motion hasn't re-started")
         motion.stop()
         assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
-    })
-
-    it.skip("Should be deleted", (done) => {
-        assert.isFulfilled(testUtils.waitUntil(1, 100, () => { return giveFalse() }), "Failed test")
-        assert.isFulfilled(testUtils.waitUntil(1, 100, () => { return giveFalse() }), "Failed")
     })
 })
 

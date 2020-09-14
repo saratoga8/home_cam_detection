@@ -16,7 +16,7 @@ describe('Detections use', async () => {
         detections.cleanDir()
         detections.start(emitter)
         let p = emitter.should.emit(detections.eventStr);
-        const imgsNum = newImgsTrashHold + 2
+        const imgsNum = newImgsTrashHold() + 2
         add_files(detectionsDirPath, imgsNum)
         return p
     })
