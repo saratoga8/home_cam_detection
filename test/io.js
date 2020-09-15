@@ -21,4 +21,18 @@ describe('IO', () => {
             expect(io.ios.CLI.out.send).to.have.been.called.with("OK")
         })
     })
+
+    it('Load YAML', () => {
+        const loadedIO = io.loadFrom('test/resources/io.yml')
+        const emitter = new EventEmitter()
+        controller.run(emitter, loadedIO)
+        emitter.emit("command", {name: commands.stopMotion.command_name})
+        expect(io.ios.CLI.out.send).to.have.been.called.with("OK")
+    })
+
+    it('test', () => {
+        let bla = null
+        bla ??= 'cock'
+        console.log(bla)
+    })
 })

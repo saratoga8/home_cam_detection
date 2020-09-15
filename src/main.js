@@ -8,7 +8,12 @@ const args = require('yargs').argv
 const pid_path = args.pid_path
 
 const EventEmitter = require("events")
-const io = require('./ios/io')
+
+const io = require('./ios/io').loadFrom('resources/io.yml')
+if(io == null) {
+    console.error("Loading IO instance failed")
+    process.exit(1)
+}
 
 process.on('SIGTERM', () => {
     motion.stop()
@@ -27,10 +32,9 @@ if(motion.hasInstalled()) {
         const emitter = new EventEmitter()
         detections.start(emitter)
         motion.start()
-        controller.run(emitter, io.ios.CLI)
-        io.ios.CLI.in.receive(emitter)
-        setInterval(() => {
-        }, 500)
+        controller.run(emitter, io)
+        io.in.receive(emitter)
+        setInterval(() => {}, 500)
     }
     else console.error("ERROR: There is no parameter: path of file for saving PID")
 }

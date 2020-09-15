@@ -1,3 +1,5 @@
-cli: on
+cli:
+  use: no
 telegram:
-  user: bla
+  use: yes
+  token: 1216968138:AAEly8wGOXWExU0_BbrjobpRjeH3vi6WSHg
