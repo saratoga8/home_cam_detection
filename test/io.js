@@ -1,6 +1,7 @@
 const chai = require('chai')
 const spies = require('chai-spies')
 const expect = chai.expect
+const assert = chai.assert
 
 
 chai.use(spies)
@@ -10,7 +11,7 @@ const commands = require('../src/commands')
 const io = require('../src/ios/io')
 
 chai.spy.on(io.ios.CLI.out, ['send'])
-
+chai.spy.on(console, ['error'])
 
 describe('IO', () => {
     context('CLI', () => {
@@ -22,17 +23,23 @@ describe('IO', () => {
         })
     })
 
-    it('Load YAML', () => {
-        const loadedIO = io.loadFrom('test/resources/io.yml')
-        const emitter = new EventEmitter()
-        controller.run(emitter, loadedIO)
-        emitter.emit("command", {name: commands.stopMotion.command_name})
-        expect(io.ios.CLI.out.send).to.have.been.called.with("OK")
-    })
+    context('Configuration', () => {
+        it('Load YAML', () => {
+            const loadedIO = io.loadFrom('test/resources/ios/cli.yml')
+            const emitter = new EventEmitter()
+            controller.run(emitter, loadedIO)
+            emitter.emit("command", {name: commands.stopMotion.command_name})
+            expect(io.ios.CLI.out.send).to.have.been.called.with("OK")
+        })
 
-    it('test', () => {
-        let bla = null
-        bla ??= 'cock'
-        console.log(bla)
+        it("File doesn't exist", () => {
+            assert.isNull(io.loadFrom('test/resources/bla-bla.poo'), "Function should return NULL")
+            expect(console.error).to.have.been.called(1)
+        })
+
+        it("There is no used IO in configure", () => {
+            assert.isNull(io.loadFrom('test/resources/ios/invalid.yml'), "Function should return NULL")
+            expect(console.error).to.have.been.called(2)
+        })
     })
 })

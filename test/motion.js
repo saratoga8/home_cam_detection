@@ -14,7 +14,6 @@ chai.use(require('chai-as-promised'))
 
 function isRunning() {
     const result = execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
-    console.log(result)
     return result !== undefined
 }
 
@@ -25,14 +24,16 @@ function isStopped() {
 
 const killMotion = () => {
     try {
-        execSync('killall motion')
+        const result = execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
+        if(result !== undefined)
+            execSync('killall motion')
     } catch (e) {
         console.error("Can't kill motion")}
 }
 
 describe('Motion use', () => {
-    after(killMotion)
-    beforeEach(killMotion)
+    after(() => { motion.stop() })
+    beforeEach('Kill motion', () => { motion.stop() })
 
     it("Motion hasn't installed", async () => {
         conf.paths.motion = "/bla/bla"
@@ -43,13 +44,7 @@ describe('Motion use', () => {
         assert.isFalse(result, "Motion HAS installed")
     })
 
-    it("Motion starting", async () => {
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
-        motion.start()
-        assert.isTrue(isRunning(), "Motion hasn't started")
-    })
-
-    it("Motion stopping", () => {
+    it("Motion starting and stopping", () => {
         assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
         motion.start()
         assert.isTrue(isRunning(), "Running Motion hasn't started")
@@ -57,7 +52,7 @@ describe('Motion use', () => {
         assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
     })
 
-    it.skip("Motion re-start", () => {
+    it("Motion re-start", () => {
         assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
         motion.start()
         assert.isTrue(isRunning(), "Running Motion hasn't started")

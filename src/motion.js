@@ -17,12 +17,15 @@ function hasInstalled() {
 
 function start () {
   try {
+    if (childProcess != null) {
+      console.warn("Killing previous instance of motion")
+      stop()
+    }
     if(childProcess == null) {
       const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
       childProcess = spawn(conf.paths.motion, [])
       console.log("Starting motion")  // TODO Should be added checking of stopping
     }
-    else console.error("Can't start another motion instance. Stop the current one before")
   } catch (e) {
     console.error(e)
   }
