@@ -8,6 +8,7 @@ const ios = { CLI: { out: cli.io.out, in: cli.io.in}, TELEGRAM: { out: tgm.io.ou
 
 /**
  * Get IO object name should be used from YAML file
+ * @access private
  * @param {string} path YAML file's path
  * @returns {string|null} Name of NULL
  */
