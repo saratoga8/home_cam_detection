@@ -22,8 +22,8 @@ const io = require('../src/ios/io')
 const {sleep} = require('sleep')
 
 describe('Controller', () => {
-    after(() => { killMotion() })
-    beforeEach('Kill motion', () => { killMotion() })
+    after(() => { motion.stop() })
+    beforeEach('Kill motion', () => { motion.stop() })
 
     it('Controller stops motion', () => {
         motion.start()
@@ -33,7 +33,7 @@ describe('Controller', () => {
         assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
     })
 
-    it('Controller start motion', () => {
+    it('Controller starts motion', () => {
         assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
         controller.run(emitter)
         emitter.emit("command", { name: commands.startMotion.command_name} )

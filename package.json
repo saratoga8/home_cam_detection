@@ -15,7 +15,8 @@
     "js-yaml": "^3.14.0",
     "process": "^0.11.10",
     "yargs": "^15.4.1",
-    "node-telegram-bot-api": "^0.50.0"
+    "node-telegram-bot-api": "^0.50.0",
+    "jsdoc": "^3.6.5"
   },
   "devDependencies": {
     "eslint": "^7.6.0",
