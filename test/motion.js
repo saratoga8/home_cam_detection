@@ -63,6 +63,26 @@ describe('Motion use', () => {
         motion.stop()
         assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
     })
+
+    it("Motion repeated starting", () => {
+        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
+        motion.start()
+        assert.isTrue(isRunning(), "Running Motion hasn't started")
+        motion.start()
+        assert.isTrue(isRunning(), "Running Motion hasn't re-started")
+        motion.stop()
+        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
+    })
+
+    it("Motion repeated stopping", () => {
+        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
+        motion.start()
+        assert.isTrue(isRunning(), "Running Motion hasn't started")
+        motion.stop()
+        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
+        motion.stop()
+        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
+    })
 })
 
 exports.killMotion = killMotion

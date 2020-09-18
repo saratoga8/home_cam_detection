@@ -10,16 +10,11 @@ const EventEmitter = require("events")
 const commands = require('../src/commands')
 const io = require('../src/ios/io')
 
+chai.spy.on(io.ios.TELEGRAM.out, ['send'])
 chai.spy.on(io.ios.CLI.out, ['send'])
 chai.spy.on(console, ['error'])
 
-const ioConf = { path: 'resources/io.yml', copyPath:  '/tmp/io.yml'}
-
 const {sleep} = require('sleep')
-
-
-const yaml = require('js-yaml')
-const api = require('node-telegram-bot-api')
 
 
 
@@ -57,29 +52,11 @@ describe('IO', () => {
     })
 
     context('Telegram', () => {
-        afterEach('restore IO config', () => { fs.copyFileSync(ioConf.copyPath, ioConf.path) })
-        beforeEach('backup IO config', () => {
-            fs.copyFileSync(ioConf.path, ioConf.copyPath)
-            fs.copyFileSync('test/resources/ios/telegram.yml', ioConf.path)
-        })
-
-        it('Hello', () => {
-            const conf = yaml.safeLoad(fs.readFileSync(ioConf.path, 'utf8'))
-            const telegram = conf.telegram
-            const token = (telegram !== undefined) ? telegram.token : undefined
-
-
-            const bot = new api(token, {polling: true})
-            bot.on('message', (msg) => {
-                bot.sendMessage(msg.chat.id, "hi!")
-            })
-        }).timeout(12000)
-
-        it.skip('Output', () => {
+        it('Output', () => {
             const emitter = new EventEmitter()
-            controller.run(emitter, io.ios.CLI)
+            controller.run(emitter, io.ios.TELEGRAM)
             emitter.emit("command", {name: commands.stopMotion.command_name})
-            expect(io.ios.CLI.out.send).to.have.been.called.with("OK")
+            expect(io.ios.TELEGRAM.out.send).to.have.been.called(1)
         })
     })
 })
