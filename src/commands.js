@@ -1,9 +1,12 @@
 const motion = require('./motion')
+const sent_data = require('./sent_data')
 const commands = {
     stopMotion: {
         command_name: "stop_motion", exec: (io = null) => {
             motion.stop()
-            if(io != null) io.out.send('OK')
+            const data = Object.create(sent_data.types.TXT)
+            data.txt = "OK"
+            if(io != null) io.out.send(data)
         }
     },
     startMotion: {

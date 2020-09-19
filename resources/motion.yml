@@ -8,4 +8,4 @@ extensions:
 max_saved_imgs: 10
 max_saved_videos: 1
 new_imgs_threshold: 15
-seconds_between_detections: 2
+seconds_between_detections: 20

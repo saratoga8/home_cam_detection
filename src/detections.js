@@ -11,6 +11,8 @@ const imgExt = conf.extensions.img
 const videoExt = conf.extensions.video
 const minTimeBetweenDetectionsSeconds = conf.seconds_between_detections
 
+const sentData = require('./sent_data')
+
 let count = 0
 
 /**
@@ -62,8 +64,11 @@ function start(emitter) {
             }
             const threshold = newImgsThreshold()
             if ((threshold !== undefined) && (count > threshold)) {
-                emitter.emit(eventStr, paths(imgExt))
+                const data = Object.create(sentData.types.IMAGES)
+                data.paths = sortPaths(paths(imgExt))
+                emitter.emit(eventStr, data)
                 count = 0
+                cleanDir()
             } else count++
         }
     })
@@ -77,14 +82,18 @@ function cleanDir() {
     delFiles(videoExt, conf.max_saved_videos)
 }
 
+function sortPaths(paths) {
+    const cmp = (path1, path2) => fs.statSync(path1).birthtimeMs - fs.statSync(path2).birthtimeMs
+    return paths.sort(cmp)
+}
+
 /**
  * Deleting files with given extensions
  * @param fileExtension File extension
  * @param maxSavedFiles Number of latest files should be saved
  */
 function delFiles(fileExtension, maxSavedFiles) {
-    const cmp = (path1, path2) => fs.statSync(path1).birthtimeMs - fs.statSync(path2).birthtimeMs
-    const sorted = paths(fileExtension).sort(cmp)
+    const sorted = sortPaths(paths(fileExtension))
     const del_elements_num = sorted.length - maxSavedFiles
     if(del_elements_num > 0)
         sorted.slice(sorted.length - del_elements_num).forEach(fs.unlinkSync)

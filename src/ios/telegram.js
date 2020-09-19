@@ -2,8 +2,13 @@ const commands = require('../commands')
 const yaml = require('js-yaml')
 const fs = require('fs')
 const api = require('node-telegram-bot-api')
+process.env["NTBA_FIX_319"] = 1
+
+const sent_data = require('../sent_data')
 
 const confPath = 'resources/io.yml'
+
+
 
 function token() {
     const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
@@ -48,17 +53,19 @@ function help() {
 }
 
 const bot_cmds = [
-    {name: "hello", exec: (emitter) => { sendMsg("hello") }},
+    {name: "hello", exec: () => { sendMsg("hello") }},
     {name: "stop", exec: (emitter) => { stopMotion(emitter) } },
     {name: "start", exec: (emitter) => { startMotion(emitter) }},
-    {name: "help", exec: (emitter) => { help() }}]
+    {name: "help", exec: () => { help() }},
+    {name: "/start", exec: () => { sendMsg("Welcome")}} ]
 
 function receiveBotMsg(emitter) {
     bot.on('message', (msg) => {
         setChatID(msg.chat.id)
-        const cmd = bot_cmds.find(cmd => cmd.name === msg.text.toString().toLowerCase())
+        const sentTxt = msg.text.toString()
+        const cmd = bot_cmds.find(cmd => cmd.name === sentTxt.toLowerCase())
         if (cmd === undefined)
-            sendMsg(`Unknown command ${cmd}`)
+            sendMsg(`Unknown command ${sentTxt}`)
         else
             cmd.exec(emitter)
     })
@@ -71,9 +78,21 @@ function receiveBotErr() {
     bot.on("polling_error", (err) => console.log(err));
 }
 
+function sendDetections(data) {
+    if(data.name === sent_data.types.IMAGES.name) {
+        data.paths.forEach(path => {
+            bot.sendPhoto(chatID, path).catch((err) => console.error(`Can't send to telegram chat the file ${path}: ${err}`))
+        })
+    }
+    else if(data.name === sent_data.types.TXT.name) {
+        bot.sendMessage(chatID, data.text).catch((err) => console.error(`Can't send to telegram chat text message: ${err}`))
+    }
+    else console.warn(`The type of detection '${data.name}' isn't supported for sending in Telegram`)
+}
+
 exports.io = {
     out: {
-        send: (str) => { }
+        send: (data) => { sendDetections(data) }
     },
     in: {
         receive: (emitter) => {

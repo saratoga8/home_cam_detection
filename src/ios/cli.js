@@ -3,7 +3,7 @@ const readline = require('readline')
 
 exports.io = {
     out: {
-        send: (str) => { console.log(str) }
+        send: (data) => { console.log(data.paths) }
     },
     in: {
         receive: (emitter) => {

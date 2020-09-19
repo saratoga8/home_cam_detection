@@ -10,7 +10,7 @@ function run(emitter, io = cli.io) {
         command.exec(io)
     })
     emitter.on(detections.eventStr, (data) => {
-        io.out.send(data.toString())
+        io.out.send(data)
     })
 }
 
