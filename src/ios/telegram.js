@@ -79,15 +79,19 @@ function receiveBotErr() {
 }
 
 function sendDetections(data) {
-    if(data.name === sent_data.types.IMAGES.name) {
-        data.paths.forEach(path => {
-            bot.sendPhoto(chatID, path).catch((err) => console.error(`Can't send to telegram chat the file ${path}: ${err}`))
-        })
+    if(bot != null) {
+        if(data.name === sent_data.types.IMAGES.name) {
+            data.paths.forEach(path => {
+                bot.sendPhoto(chatID, path).catch((err) => console.error(`Can't send to telegram chat the file ${path}: ${err}`))
+            })
+        }
+        else if(data.name === sent_data.types.TXT.name) {
+            bot.sendMessage(chatID, data.text).catch((err) => console.error(`Can't send to telegram chat text message: ${err}`))
+        }
+        else console.warn(`The type of detection '${data.name}' isn't supported for sending in Telegram`)
     }
-    else if(data.name === sent_data.types.TXT.name) {
-        bot.sendMessage(chatID, data.text).catch((err) => console.error(`Can't send to telegram chat text message: ${err}`))
-    }
-    else console.warn(`The type of detection '${data.name}' isn't supported for sending in Telegram`)
+    else
+        console.error("Telegram bot instance hasn't initialized")
 }
 
 exports.io = {

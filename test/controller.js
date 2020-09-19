@@ -21,9 +21,14 @@ const io = require('../src/ios/io')
 
 const {sleep} = require('sleep')
 
+
 describe('Controller', () => {
     after(() => { motion.stop() })
-    beforeEach('Kill motion', () => { motion.stop() })
+    afterEach( function() { chai.spy.restore(io.ios.CLI.out) })
+    beforeEach('Kill motion', function() {
+        chai.spy.on(io.ios.CLI.out, ['send'])
+        motion.stop()
+    })
 
     it('Controller stops motion', () => {
         motion.start()
@@ -43,9 +48,8 @@ describe('Controller', () => {
     it('Controller detected motion', () => {
         detections.start(emitter)
         controller.run(emitter, io.ios.CLI)
-        const imgsNum = newImgsTrashHold + 2
+        const imgsNum = newImgsTrashHold() + 2
         add_files(detectionsDirPath, imgsNum)
         expect(io.ios.CLI.out.send).to.have.been.called(1)
-        expect(io.ios.CLI.out.send).to.have.been.called.with("OK")
     })
 })

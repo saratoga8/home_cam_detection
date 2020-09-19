@@ -27,6 +27,7 @@ Feature: Motion detecting by program
     And There are detections with number more than threshold
     Then Program DOES detect motion
 
+  @dev
   Scenario: Detection periods don't depend on each other
     And User sets time between detections 2s
     And There are detections with number less than threshold

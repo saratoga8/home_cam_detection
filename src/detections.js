@@ -65,7 +65,7 @@ function start(emitter) {
             const threshold = newImgsThreshold()
             if ((threshold !== undefined) && (count > threshold)) {
                 const data = Object.create(sentData.types.IMAGES)
-                data.paths = sortPaths(paths(imgExt))
+                data.paths = sortPaths(paths(imgExt)).slice(0, count)
                 emitter.emit(eventStr, data)
                 count = 0
                 cleanDir()
