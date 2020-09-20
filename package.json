@@ -5,7 +5,8 @@
   "main": "src/main.js",
   "scripts": {
     "test": "mocha",
-    "start": "node src/main.js"
+    "start": "node src/main.js --pid_path=bin/.pid",
+    "stop": "cd bin && ./stop.sh && cd .."
   },
   "repository": {
     "type": "git",
