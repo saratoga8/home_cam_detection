@@ -7,7 +7,7 @@ const testUtils = require('./utils')
 const { isRunning, killMotion, isStopped } = require('./motion')
 
 const EventEmitter = require("events")
-const emitter = new EventEmitter()
+
 
 const {add_files, detectionsDirPath, newImgsTrashHold} = require('./utils')
 const detections = require('../src/detections')
@@ -21,11 +21,13 @@ const io = require('../src/ios/io')
 
 const {sleep} = require('sleep')
 
+let emitter = null
 
 describe('Controller', () => {
     after(() => { motion.stop() })
     afterEach( function() { chai.spy.restore(io.ios.CLI.out) })
     beforeEach('Kill motion', function() {
+        emitter = new EventEmitter()
         chai.spy.on(io.ios.CLI.out, ['send'])
         motion.stop()
     })
@@ -48,8 +50,7 @@ describe('Controller', () => {
     it('Controller detected motion', () => {
         detections.start(emitter)
         controller.run(emitter, io.ios.CLI)
-        const imgsNum = newImgsTrashHold() + 2
-        add_files(detectionsDirPath, imgsNum)
+        emitter.emit("detected_motion", 'bla')
         expect(io.ios.CLI.out.send).to.have.been.called(1)
     })
 })

@@ -2,7 +2,7 @@
 
 const yaml = require('js-yaml')
 const fs = require('fs')
-const { sep, extname } = require('path')
+const { sep, extname, join } = require('path')
 
 const config_path = 'resources/motion.yml'
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
@@ -57,19 +57,21 @@ function paths(fileExtension) {
  */
 function start(emitter) {
     fs.watch(dirPath, {persistent: false}, (event, file) => {
-        if (file.endsWith(`.${imgExt}`)) {
-            if((toNowSeconds() - lastDetectionDate) > minTimeBetweenDetectionsSeconds) {
-                count = 0
-                lastDetectionDate = toNowSeconds()
+        if(fs.existsSync(join(dirPath, file))) {
+            if (file.endsWith(`.${imgExt}`)) {
+                if ((toNowSeconds() - lastDetectionDate) > minTimeBetweenDetectionsSeconds) {
+                    count = 0
+                    lastDetectionDate = toNowSeconds()
+                }
+                const threshold = newImgsThreshold()
+                if ((threshold !== undefined) && (count > threshold)) {
+                    const data = Object.create(sentData.types.IMAGES)
+                    data.paths = sortPaths(paths(imgExt)).slice(0, count)
+                    emitter.emit(eventStr, data)
+                    count = 0
+                    cleanDir()
+                } else count++
             }
-            const threshold = newImgsThreshold()
-            if ((threshold !== undefined) && (count > threshold)) {
-                const data = Object.create(sentData.types.IMAGES)
-                data.paths = sortPaths(paths(imgExt)).slice(0, count)
-                emitter.emit(eventStr, data)
-                count = 0
-                cleanDir()
-            } else count++
         }
     })
 }
