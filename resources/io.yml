@@ -1,5 +1,6 @@
 cli:
-  use: no
+  use: 'no'
 telegram:
-  use: yes
-  token: bla-bla
+  use: 'yes'
+  token: '1312974480:AAE1fenk82hEuUI-bVKzCbtC27ucOPqDGtU'
+  chatID: 1320889499

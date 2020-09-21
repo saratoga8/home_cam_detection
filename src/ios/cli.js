@@ -1,6 +1,6 @@
 const commands = require('../commands')
 const readline = require('readline')
-const sent_data = require('../sent_data')
+const sent_data = require('./sent_data')
 
 exports.io = {
     out: {

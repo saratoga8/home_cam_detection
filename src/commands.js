@@ -1,5 +1,5 @@
 const motion = require('./motion')
-const sent_data = require('./sent_data')
+const sent_data = require('./ios/sent_data')
 const commands = {
     stopMotion: {
         command_name: "stop_motion", exec: (io = null) => {

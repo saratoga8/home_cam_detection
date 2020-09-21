@@ -4,7 +4,7 @@ const fs = require('fs')
 const api = require('node-telegram-bot-api')
 process.env["NTBA_FIX_319"] = 1
 
-const sent_data = require('../sent_data')
+const sent_data = require('./sent_data')
 
 const confPath = 'resources/io.yml'
 

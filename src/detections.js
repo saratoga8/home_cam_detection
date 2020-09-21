@@ -11,7 +11,7 @@ const imgExt = conf.extensions.img
 const videoExt = conf.extensions.video
 const minTimeBetweenDetectionsSeconds = conf.seconds_between_detections
 
-const sentData = require('./sent_data')
+const sentData = require('./ios/sent_data')
 
 let count = 0
 
