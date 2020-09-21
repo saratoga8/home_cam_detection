@@ -1,5 +1,5 @@
 cli:
-  use: 'no'
+  use: no
 telegram:
-  use: 'yes'
+  use: yes
   token: bla-bla
