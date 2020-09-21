@@ -2,5 +2,4 @@ cli:
   use: 'no'
 telegram:
   use: 'yes'
-  token: '1312974480:AAE1fenk82hEuUI-bVKzCbtC27ucOPqDGtU'
-  chatID: 1320889499
+  token: bla-bla
