@@ -2,13 +2,17 @@ const commands = require('../commands')
 const yaml = require('js-yaml')
 const fs = require('fs')
 const api = require('node-telegram-bot-api')
-process.env["NTBA_FIX_319"] = 1
+process.env["NTBA_FIX_350"] = 1
 
 const sent_data = require('./sent_data')
 
 const confPath = 'resources/io.yml'
+const {sleep} = require('sleep')
 
-
+const mediaMsgType = () => {
+    const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
+    return (conf === undefined || conf.telegram === undefined) ? 'image' : conf.telegram.msg_type
+}
 
 function token() {
     const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
@@ -78,20 +82,31 @@ function receiveBotErr() {
     bot.on("polling_error", (err) => console.log(err));
 }
 
-function sendDetections(data) {
+function botInitialized() {
     if(bot != null) {
-        if(data.name === sent_data.types.IMAGES.name) {
-            data.paths.forEach(path => {
-                bot.sendPhoto(chatID, path).catch((err) => console.error(`Can't send to telegram chat the file ${path}: ${err}`))
-            })
-        }
-        else if(data.name === sent_data.types.TXT.name) {
-            bot.sendMessage(chatID, data.text).catch((err) => console.error(`Can't send to telegram chat text message: ${err}`))
-        }
-        else console.warn(`The type of detection '${data.name}' isn't supported for sending in Telegram`)
+        if (chatID != null) return true
+        console.error("Chat ID of telegram bot hasn't initialized")
+    } else
+        console.error("Telegram bot instance hasn't initialized")
+    return false
+}
+
+function sendDetections(data) {
+    if (!botInitialized()) return
+    if(data.name === sent_data.types.IMAGES.name && data.name === mediaMsgType()) {
+        data.paths.forEach(path => {
+            bot.sendPhoto(chatID, path).catch((err) => console.error(`Can't send to telegram chat the file ${path}: ${err}`))
+        })
+    }
+    else if(data.name === sent_data.types.TXT.name) {
+        bot.sendMessage(chatID, data.text).catch((err) => console.error(`Can't send to telegram chat text message: ${err}`))
+    }
+    else if(data.name === sent_data.types.VIDEO.name && data.name === mediaMsgType()) {
+        if(fs.statSync(data.path).size > 1000)
+            bot.sendVideoNote(chatID, data.path).catch((err) => console.error(`Can't send to telegram chat the file ${data.path}: ${err}`))
     }
     else
-        console.error("Telegram bot instance hasn't initialized")
+        console.warn(`The type of detection '${data.name}' isn't supported for sending in Telegram`)
 }
 
 exports.io = {

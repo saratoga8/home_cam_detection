@@ -74,7 +74,17 @@ function start(emitter) {
             }
         }
     })
+    fs.watch('/tmp', {persistent: false}, (event, fileName) => {
+        if(event == 'rename' && fileName == 'video.finished') {
+            const path = sortPaths(paths(videoExt))[0]
+            const data = Object.create(sentData.types.VIDEO)
+            data.path = path
+            emitter.emit(eventStr, data)
+            cleanDir()
+        }
+    })
 }
+
 
 /**
  * Cleaning detections directory
@@ -85,7 +95,7 @@ function cleanDir() {
 }
 
 function sortPaths(paths) {
-    const cmp = (path1, path2) => fs.statSync(path1).birthtimeMs - fs.statSync(path2).birthtimeMs
+    const cmp = (path1, path2) => fs.statSync(path2).birthtimeMs - fs.statSync(path1).birthtimeMs
     return paths.sort(cmp)
 }
 

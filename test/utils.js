@@ -26,7 +26,7 @@ exports.maxSavedImgs = conf.max_saved_imgs
 exports.detectionsDirPath = conf.paths.detections_dir
 exports.newImgsTrashHold = () => yaml.safeLoad(fs.readFileSync(config_path, 'utf8')).new_imgs_threshold
 
-exports.add_files = (path, num) => {
+exports.addImgFiles = (path, num) => {
     for(let i = 0; i < num; i++) {
         const imgPath = `${path}${sep}file${Math.floor(Math.random() * 1000)}.jpg`
         fs.writeFileSync(imgPath, "", {flag: 'w'})

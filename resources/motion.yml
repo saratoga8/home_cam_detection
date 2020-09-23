@@ -4,7 +4,7 @@ paths:
   detections_dir: /home/saratoga/.motion/detections
 extensions:
   img: jpg
-  video: avi
+  video: mp4
 max_saved_imgs: 10
 max_saved_videos: 1
 new_imgs_threshold: 15

@@ -43,10 +43,10 @@ The settings are in the file __resources/motion.yml__
 ## Telegram bot settings of the project
 The settings are in the file __resources/io.yml__. The file contains different Input/Output instances for notifications. E.g. Telegram or CLI(for tests only). Only one instance should be used per run
 #### Telegram:
-- *use* - Is the instance should be used for notification (value: __yes__/__no__)
+- *use* - Should the instance be used for notification (value: __yes__/__no__)
 - *token* - API token of created Telegram bot
 #### Cli (for tests only): 
-- *use* - Is the instance should be used for notification (value: __yes__/__no__)
+- *use* - Should the instance be used for notification (value: __yes__/__no__)
 
 ## Telegram bot commands
 * *help* - print all commands

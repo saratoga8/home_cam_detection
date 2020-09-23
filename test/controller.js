@@ -9,7 +9,7 @@ const { isRunning, killMotion, isStopped } = require('./motion')
 const EventEmitter = require("events")
 
 
-const {add_files, detectionsDirPath, newImgsTrashHold} = require('./utils')
+const {addImgFiles, detectionsDirPath, newImgsTrashHold} = require('./utils')
 const detections = require('../src/detections')
 
 const spies = require('chai-spies')

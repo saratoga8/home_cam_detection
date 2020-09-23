@@ -7,7 +7,7 @@ chai.use(require('chai-fs'))
 const fs = require('fs')
 const {sleep} = require('sleep')
 
-const {add_files, detectionsDirPath, newImgsTrashHold} = require('../../test/utils')
+const {addImgFiles, detectionsDirPath, newImgsTrashHold} = require('../../test/utils')
 
 const yaml = require('js-yaml')
 const config_path = 'resources/motion.yml'
@@ -17,7 +17,7 @@ const {execSync} = require('child_process')
 When(/^There are detections with number (more|less) than threshold$/, function (action) {
     assert.pathExists(detectionsDirPath, "There is no directory of detections")
     const imgsNum = Math.round((action == 'more') ? newImgsTrashHold() + 2 : newImgsTrashHold() / 2)
-    add_files(detectionsDirPath, imgsNum)
+    addImgFiles(detectionsDirPath, imgsNum)
     sleep(3)
 });
 

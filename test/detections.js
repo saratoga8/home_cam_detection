@@ -9,7 +9,10 @@ chai.use(require("chai-events"));
 const EventEmitter = require("events");
 
 const emitter = new EventEmitter()
-const {add_files, maxSavedImgs, detectionsDirPath, newImgsTrashHold} = require('./utils')
+const {addImgFiles, maxSavedImgs, detectionsDirPath, newImgsTrashHold} = require('./utils')
+
+const {sep} = require('path')
+const {sleep, msleep} = require('sleep')
 
 describe('Detections use', async () => {
     it('start detecting', async () => {
@@ -17,13 +20,13 @@ describe('Detections use', async () => {
         detections.start(emitter)
         let p = emitter.should.emit(detections.eventStr);
         const imgsNum = newImgsTrashHold() + 2
-        add_files(detectionsDirPath, imgsNum)
+        addImgFiles(detectionsDirPath, imgsNum)
         return p
     })
 
     it('clean old images', () => {
         const newFiles = parseInt(maxSavedImgs + 5)
-        add_files(detectionsDirPath, newFiles)
+        addImgFiles(detectionsDirPath, newFiles)
         const imgsNumStr = () => { return execSync(`ls ${detectionsDirPath}/*.jpg | wc -l`).toString() }
         assert.isAtLeast(parseInt(imgsNumStr()), newFiles, "There is not enough added images")
         detections.cleanDir()
