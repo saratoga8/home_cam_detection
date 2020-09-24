@@ -1,5 +1,6 @@
 const motion = require('./motion')
 const process = require('process');
+process.env["NTBA_FIX_350"] = 1
 const fs = require('fs')
 const controller = require('./controller')
 const detections = require('../src/detections')
