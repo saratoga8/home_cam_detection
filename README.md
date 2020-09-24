@@ -1,6 +1,6 @@
 Detecting motion by camera and notifying user
 ===================
-Regular camera can be connected to you computer and used for detecting any motion. In the case of motion detecting, notification will be sent to the user by messenger(e.g. Telegram or Slack)
+Regular camera can be connected to you computer and used for detecting any motion. When motion detected, notification will be sent to the user by messenger(e.g. Telegram or Slack)
 
 ## Technologies
 The project developed with:
