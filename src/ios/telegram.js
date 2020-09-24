@@ -5,9 +5,10 @@ const api = require('node-telegram-bot-api')
 process.env["NTBA_FIX_350"] = 1
 
 const sent_data = require('./sent_data')
-
 const confPath = 'resources/io.yml'
-const {sleep} = require('sleep')
+
+const mediaGrpSize = 10
+const videoMaxSize = 52428800
 
 const mediaMsgType = () => {
     const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
@@ -82,7 +83,7 @@ function receiveBotErr() {
     bot.on("polling_error", (err) => console.log(err));
 }
 
-function botInitialized() {
+function hasBotInitialized() {
     if(bot != null) {
         if (chatID != null) return true
         console.error("Chat ID of telegram bot hasn't initialized")
@@ -91,22 +92,45 @@ function botInitialized() {
     return false
 }
 
+function sendPics(data) {
+    if(data.name.startsWith(mediaMsgType())) {
+        const paths = data.paths.slice(0, 9)
+        const mediaGrp = []
+        paths.forEach(path => mediaGrp.push({type: 'photo', media: path}) )
+        bot.sendMediaGroup(chatID, mediaGrp).catch((err) => console.error(`Can't send to telegram group of images: ${err}`))
+    }
+}
+
+function sendTxt(data) {
+    bot.sendMessage(chatID, data.text).catch((err) => console.error(`Can't send to telegram chat text message: ${err}`))
+}
+
+function sendVideo(data, minFileSizeByte) {
+    if(data.name === mediaMsgType()) {
+        const size = fs.statSync(data.path).size
+        if(size > minFileSizeByte) {
+            if(size < videoMaxSize) {
+                bot.sendVideoNote(chatID, data.path)
+                    .catch((err) => console.error(`Can't send to telegram chat the file ${data.path}: ${err}`))
+            }
+            else
+                console.error(`Sent video size is ${size} and should be less then ${videoMaxSize}`)
+        }
+    }
+}
+
 function sendDetections(data) {
-    if (!botInitialized()) return
-    if(data.name === sent_data.types.IMAGES.name && data.name === mediaMsgType()) {
-        data.paths.forEach(path => {
-            bot.sendPhoto(chatID, path).catch((err) => console.error(`Can't send to telegram chat the file ${path}: ${err}`))
-        })
+    if (hasBotInitialized()) {
+        const actions = {
+            [sent_data.types.IMAGES.name]: () => { sendPics(data) },
+            [sent_data.types.TXT.name]:    () => { sendTxt(data) },
+            [sent_data.types.VIDEO.name]:  () => { sendVideo(data, 1024) }
+        }
+        if (data.name in actions)
+            actions[data.name]()
+        else
+            console.error(`The type of detection '${data.name}' isn't supported for sending in Telegram`)
     }
-    else if(data.name === sent_data.types.TXT.name) {
-        bot.sendMessage(chatID, data.text).catch((err) => console.error(`Can't send to telegram chat text message: ${err}`))
-    }
-    else if(data.name === sent_data.types.VIDEO.name && data.name === mediaMsgType()) {
-        if(fs.statSync(data.path).size > 1000)
-            bot.sendVideoNote(chatID, data.path).catch((err) => console.error(`Can't send to telegram chat the file ${data.path}: ${err}`))
-    }
-    else
-        console.warn(`The type of detection '${data.name}' isn't supported for sending in Telegram`)
 }
 
 exports.io = {
@@ -116,8 +140,8 @@ exports.io = {
     in: {
         receive: (emitter) => {
             bot = bot ?? new api(token(), {polling: true})
-            receiveBotMsg(emitter);
-            receiveBotErr();
+            receiveBotMsg(emitter)
+            receiveBotErr()
             emitter.on('close', () => {process.exit(0)})
         }
     }

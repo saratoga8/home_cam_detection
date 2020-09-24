@@ -17,7 +17,7 @@ The project tested with:
 - Connected camera
 
 ## Getting started
-1. Install Motion and configure it by editing file __motion.conf__ according to [manual](https://motion-project.github.io/motion_config.html) 
+1. Install Motion and configure it by editing file __motion.conf__ according to [manual](https://motion-project.github.io/motion_config.html). Configuring motion remember about size limitations of sending data to messengers(e.g. Telegram limits sent video to 50M)
 2.  Install NodeJS
 3. [Edit file resources/motion.yml in the project directory](#Motion-settings-of-the-project) 
 4. Create Telegram bot and take its API token. See [this](https://core.telegram.org/bots#6-botfather)
