@@ -17,14 +17,16 @@ The project tested with:
 - Connected camera
 
 ## Getting started
-1. Install Motion and configure it by editing file __motion.conf__ according to [(Motion configuration)](#Motion-configuration). Configuring motion remember about size limitations of sending data to messengers(e.g. Telegram limits sent video to 50M)
+1. Install Motion and configure it by editing file __motion.conf__ according to [Motion configuration](#Motion-configuration). Configuring motion remember about size limitations of sending data to messengers(e.g. Telegram limits sent video to 50M)
 2.  Install NodeJS
-3. [Edit file resources/motion.yml in the project directory](#Motion-settings-of-the-project) 
-4. Create Telegram bot and take its API token. See [this](https://core.telegram.org/bots#6-botfather)
-5. Add the taken API token to the __resources/io.yml__[(Telegram bot settings)](#Telegram-bot-settings-of-the-project)
-6. From project's directory run: `npm start &`
-7. From the created Telegram bot send text *start* [(Telegram bot commands)](#Telegram-bot-commands)
-8. To stop run: `npm stop`
+3. Download the project
+4. Edit file resources/motion.yml in the project directory. See [this](#Motion-settings-of-the-project) 
+5. Create Telegram bot and take its API token. See [this](https://core.telegram.org/bots#6-botfather)
+6. Add the taken API token to the __resources/io.yml__[(Telegram bot settings)](#Telegram-bot-settings-of-the-project)
+7. From project's directory run: `npm start &`
+8. From the created Telegram bot send text *hello* [(Telegram bot commands)](#Telegram-bot-commands)
+9. For stopping/starting motion detecting use commands *start/stop* 
+10. To stop run: `npm stop`
 
 ## Motion configuration
 After install, Motion's config file usually is in __${MOTION_CONF_PATH}/motion.conf__, where *${MOTION_CONF_PATH}* is __.motion__ directory in the directory of your current user(`$HOME/.motion`). In the __motion.conf__ the values of the next variables should be set:
@@ -67,3 +69,9 @@ The settings are in the file __resources/io.yml__. The file contains different I
 *  *start* - start detecting motions
 *  *stop* - stop detecting motions 
 *  *hello* - initialize connection to bot(use just after creating bot)
+
+## Planned features
+* Auto stop/start of motion detecting by pinging of user's phone device (E.g. if the device isn't reachable then detecting will be started)
+* Scheduled stop/start of motion detecting (E.g. every weekend stop motion detecting)
+* Slack support
+* Support running in a cloud in the case of web camera use
