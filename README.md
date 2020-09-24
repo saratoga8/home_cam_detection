@@ -45,8 +45,8 @@ After install, Motion's config file usually is in __${MOTION_CONF_PATH}/motion.c
 The settings are in the file __resources/motion.yml__
 #### Paths:
 - *motion* - path to the motion program(use command `which motion`)
--  *conf_dir* - path to the config directory of motion (usually *.motion* in the user's directory, see [(Motion configuration)](#Motion-configuration))
--  *detections_dir* - path to the directory containing detections information(value of *target_dir* from [(Motion configuration)](#Motion-configuration)))
+-  *conf_dir* - path to the config directory of motion (usually *.motion* in the user's directory, see [Motion configuration](#Motion-configuration))
+-  *detections_dir* - path to the directory containing detections information(value of *target_dir* from [Motion configuration](#Motion-configuration))
 #### Extensions:
 - *img* - Extension of image files with detections, same as in __motion.conf__
 -  *video* - Extension of video files with detections(depends on supported by Motion and the messenger. E.g. Telegram support only MP4), same as in __motion.conf__
