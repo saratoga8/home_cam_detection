@@ -17,24 +17,37 @@ The project tested with:
 - Connected camera
 
 ## Getting started
-1. Install Motion and configure it by editing file __motion.conf__ according to [manual](https://motion-project.github.io/motion_config.html). Configuring motion remember about size limitations of sending data to messengers(e.g. Telegram limits sent video to 50M)
+1. Install Motion and configure it by editing file __motion.conf__ according to [(Motion configuration)](#Motion-configuration). Configuring motion remember about size limitations of sending data to messengers(e.g. Telegram limits sent video to 50M)
 2.  Install NodeJS
 3. [Edit file resources/motion.yml in the project directory](#Motion-settings-of-the-project) 
 4. Create Telegram bot and take its API token. See [this](https://core.telegram.org/bots#6-botfather)
 5. Add the taken API token to the __resources/io.yml__[(Telegram bot settings)](#Telegram-bot-settings-of-the-project)
 6. From project's directory run: `npm start &`
-7. From the created Telegram bot send text *hello* [(Telegram bot commands)](#Telegram-bot-commands)
+7. From the created Telegram bot send text *start* [(Telegram bot commands)](#Telegram-bot-commands)
 8. To stop run: `npm stop`
+
+## Motion configuration
+After install, Motion's config file usually is in __${MOTION_CONF_PATH}/motion.conf__, where *${MOTION_CONF_PATH}* is __.motion__ directory in the directory of your current user(`$HOME/.motion`). In the __motion.conf__ the values of the next variables should be set:
+- *process_id_file* - __${MOTION_CONF_PATH}/motion.pid__ (change ${MOTION_CONF_PATH} by the real path)
+- *logfile* - __${MOTION_CONF_PATH}/log/motion.log__
+- *videodevice* - Path to your camera device, usually it is /dev/video0 (if there is only one camera)
+- *max_movie_time* - Maximal time in seconds of created movie. Shouldn't be too long, 10 seconds is pretty enough
+- *output_pictures* - If you don't want to get notifications with pictures(only videos), set it __off__
+- *ffmpeg_output_movies* - If you want to get notifications with videos only, set it __on__
+- *ffmpeg_video_codec* - For Telegram __mp4__(others haven't checked)
+- *target_dir* - Directory for saving images/videos of motion detections, set it __${MOTION_CONF_PATH}/detections__
+- *on_movie_start* - Set it __rm -f /tmp/video.finished__
+- *on_movie_end* - Set it __touch /tmp/video.finished__ 
 
 ## Motion settings of the project
 The settings are in the file __resources/motion.yml__
 #### Paths:
 - *motion* - path to the motion program(use command `which motion`)
--  *conf_dir* - path to the directory of motion (usually *.motion* in the user's directory)
--  *detections_dir* - path to the directory containing detections information(image files and videos)
+-  *conf_dir* - path to the config directory of motion (usually *.motion* in the user's directory, see [(Motion configuration)](#Motion-configuration))
+-  *detections_dir* - path to the directory containing detections information(value of *target_dir* from [(Motion configuration)](#Motion-configuration)))
 #### Extensions:
-- *img* - Extension of image files with detections
--  *video* - Extension of video files with detections
+- *img* - Extension of image files with detections, same as in __motion.conf__
+-  *video* - Extension of video files with detections(depends on supported by Motion and the messenger. E.g. Telegram support only MP4), same as in __motion.conf__
 -  *max_saved_imgs* - Directory of detections is being cleaned periodically. All files removed except the given number of the oldest ones
 -  *max_saved_videos* - The same as the previous, just for video files
 -  *new_imgs_threshold* - Notification will be sent only if there are number of detection images more then the given threshold
@@ -45,6 +58,7 @@ The settings are in the file __resources/io.yml__. The file contains different I
 #### Telegram:
 - *use* - Should the instance be used for notification (value: __yes__/__no__)
 - *token* - API token of created Telegram bot
+- *msg_type* - type of notification message(value: __image__/__video__)
 #### Cli (for tests only): 
 - *use* - Should the instance be used for notification (value: __yes__/__no__)
 
