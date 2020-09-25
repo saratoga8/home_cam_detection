@@ -94,10 +94,11 @@ function hasBotInitialized() {
 
 function sendPics(data) {
     if(data.name.startsWith(mediaMsgType())) {
-        const paths = data.paths.slice(0, 9)
-        const mediaGrp = []
-        paths.forEach(path => mediaGrp.push({type: 'photo', media: path}) )
-        bot.sendMediaGroup(chatID, mediaGrp).catch((err) => console.error(`Can't send to telegram group of images: ${err}`))
+        for(let i = 0; i < data.paths.length; i += mediaGrpSize) {
+            const pathsArr = (i + mediaGrpSize > data.paths.length) ? data.paths.slice(i) : data.paths.slice(i, mediaGrpSize)
+            const mediaGrp = pathsArr.map(path => { return {type: 'photo', media: path}})
+            bot.sendMediaGroup(chatID, mediaGrp).catch((err) => console.error(`Can't send to telegram group of images: ${err}`))
+        }
     }
 }
 

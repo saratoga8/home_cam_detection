@@ -27,7 +27,7 @@ function start () {
     }
     if(childProcess == null) {
       const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
-      childProcess = spawn(conf.paths.motion, [])
+      childProcess = spawn(conf.paths.motion, ['-c', 'resources/motion.conf'])
       console.log("Starting motion")  // TODO Should be added checking of stopping
     }
   } catch (e) {

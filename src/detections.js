@@ -2,11 +2,11 @@
 
 const yaml = require('js-yaml')
 const fs = require('fs')
-const { sep, extname, join } = require('path')
+const { sep, extname, join, resolve } = require('path')
 
 const config_path = 'resources/motion.yml'
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
-const dirPath = conf.paths.detections_dir
+const dirPath = resolve(__dirname, "../motion/detections")
 const imgExt = conf.extensions.img
 const videoExt = conf.extensions.video
 const minTimeBetweenDetectionsSeconds = conf.seconds_between_detections
@@ -56,8 +56,9 @@ function paths(fileExtension) {
  * @fires Detection event
  */
 function start(emitter) {
+    !fs.existsSync(dirPath) && fs.mkdirSync(dirPath, {recursive: true})
     fs.watch(dirPath, {persistent: false}, (event, file) => {
-        if(fs.existsSync(join(dirPath, file))) {
+        if (fs.existsSync(join(dirPath, file))) {
             if (file.endsWith(`.${imgExt}`)) {
                 if ((toNowSeconds() - lastDetectionDate) > minTimeBetweenDetectionsSeconds) {
                     count = 0
@@ -75,7 +76,7 @@ function start(emitter) {
         }
     })
     fs.watch('/tmp', {persistent: false}, (event, fileName) => {
-        if(event == 'rename' && fileName == 'video.finished') {
+        if (event == 'rename' && fileName == 'video.finished') {
             const path = sortPaths(paths(videoExt))[0]
             const data = Object.create(sentData.types.VIDEO)
             data.path = path
