@@ -6,7 +6,7 @@ const assert = chai.assert
 const {waitUntil, detectionsDirPath} = require('../../test/utils')
 chai.use(require('chai-as-promised'))
 
-const config_path = 'resources/motion.yml'
+const config_path = 'resources/detections.yml'
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 //const detectionsDirPath = conf.paths.detections_dir
 const ext = conf.extensions.img

@@ -4,7 +4,7 @@ const yaml = require('js-yaml')
 const fs = require('fs')
 const { sep, extname, join, resolve } = require('path')
 
-const config_path = 'resources/motion.yml'
+const config_path = 'resources/detections.yml'
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 const dirPath = resolve(__dirname, "../motion/detections")
 const imgExt = conf.extensions.img

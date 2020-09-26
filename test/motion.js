@@ -1,5 +1,5 @@
 const yaml = require('js-yaml')
-const config_path = 'resources/motion.yml'
+const config_path = 'resources/detections.yml'
 const fs = require('fs')
 const motion = require('../src/motion')
 const {execSync, exec} = require('child_process')

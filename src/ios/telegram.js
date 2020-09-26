@@ -15,7 +15,7 @@ const mediaMsgType = () => {
     return (conf === undefined || conf.telegram === undefined) ? 'image' : conf.telegram.msg_type
 }
 
-function token() {
+function loadToken() {
     const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
     const telegram = conf.telegram
     return (telegram !== undefined) ? telegram.token : undefined
@@ -36,10 +36,16 @@ function setChatID(ID) {
         const telegram = conf.telegram
         if(telegram.chatID !== ID) {
             conf.telegram.chatID = ID
-            fs.writeFile(confPath, yaml.safeDump(conf, 'utf8'), (err => console.error(`Can't write to file ${confPath}: ${err}`)))
+            fs.writeFileSync(confPath, yaml.safeDump(conf, 'utf8'), (err => console.error(`Can't write to file ${confPath}: ${err}`)))
         }
         chatID = ID
     }
+}
+
+function loadChatID() {
+    const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
+    const telegram = conf.telegram
+    return telegram.chatID
 }
 
 function stopMotion(emitter) {
@@ -65,31 +71,26 @@ const bot_cmds = [
     {name: "/start", exec: () => { sendMsg("Welcome")}} ]
 
 function receiveBotMsg(emitter) {
-    bot.on('message', (msg) => {
-        setChatID(msg.chat.id)
-        const sentTxt = msg.text.toString()
-        const cmd = bot_cmds.find(cmd => cmd.name === sentTxt.toLowerCase())
-        if (cmd === undefined)
-            sendMsg(`Unknown command ${sentTxt}`)
-        else
-            cmd.exec(emitter)
-    })
+    if(bot != null) {
+        bot.on('message', (msg) => {
+            setChatID(msg.chat.id)
+            const sentTxt = msg.text.toString()
+            const cmd = bot_cmds.find(cmd => cmd.name === sentTxt.toLowerCase())
+            if (cmd === undefined)
+                sendMsg(`Unknown command ${sentTxt}`)
+            else
+                cmd.exec(emitter)
+        })
+    }
 }
 
 function receiveBotErr() {
-    bot.on('error', (msg) => {
-        console.error(`There is error in connecting to Telegram Bot: ${msg.text.toString()}`)
-    })
-    bot.on("polling_error", (err) => console.log(err));
-}
-
-function hasBotInitialized() {
     if(bot != null) {
-        if (chatID != null) return true
-        console.error("Chat ID of telegram bot hasn't initialized")
-    } else
-        console.error("Telegram bot instance hasn't initialized")
-    return false
+        bot.on('error', (msg) => {
+            console.error(`There is error in connecting to Telegram Bot: ${msg.text.toString()}`)
+        })
+        bot.on("polling_error", (err) => console.log(err));
+    }
 }
 
 function sendPics(data) {
@@ -120,18 +121,30 @@ function sendVideo(data, minFileSizeByte) {
     }
 }
 
-function sendDetections(data) {
-    if (hasBotInitialized()) {
-        const actions = {
-            [sent_data.types.IMAGES.name]: () => { sendPics(data) },
-            [sent_data.types.TXT.name]:    () => { sendTxt(data) },
-            [sent_data.types.VIDEO.name]:  () => { sendVideo(data, 1024) }
-        }
-        if (data.name in actions)
-            actions[data.name]()
+function initBot() {
+    if(bot == null) {
+        const token = loadToken()
+        if(token !== undefined)
+            bot = new api(token, {polling: true})
         else
-            console.error(`The type of detection '${data.name}' isn't supported for sending in Telegram`)
+            console.error("There is no Telegram bot API token found")
     }
+}
+
+function sendDetections(data) {
+    if (bot == null) initBot()
+    if (chatID == null)
+        chatID = loadChatID()
+
+    const actions = {
+        [sent_data.types.IMAGES.name]: () => { sendPics(data) },
+        [sent_data.types.TXT.name]:    () => { sendTxt(data) },
+        [sent_data.types.VIDEO.name]:  () => { sendVideo(data, 1024) }
+    }
+    if (data.name in actions)
+        actions[data.name]()
+    else
+        console.error(`The type of detection '${data.name}' isn't supported for sending in Telegram`)
 }
 
 exports.io = {
@@ -140,7 +153,7 @@ exports.io = {
     },
     in: {
         receive: (emitter) => {
-            bot = bot ?? new api(token(), {polling: true})
+            initBot()
             receiveBotMsg(emitter)
             receiveBotErr()
             emitter.on('close', () => {process.exit(0)})

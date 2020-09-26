@@ -5,5 +5,5 @@ extensions:
   video: mp4
 max_saved_imgs: 10
 max_saved_videos: 1
-new_imgs_threshold: 15
+new_imgs_threshold: 5
 seconds_between_detections: 10

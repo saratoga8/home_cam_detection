@@ -19,7 +19,7 @@ function waitUntil(timeoutSec, sleepMs = 100, callback) {
     })
 }
 
-const config_path = 'resources/motion.yml'
+const config_path = 'resources/detections.yml'
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 
 exports.maxSavedImgs = conf.max_saved_imgs

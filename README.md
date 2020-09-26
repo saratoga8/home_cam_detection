@@ -17,32 +17,22 @@ The project tested with:
 - Connected camera
 
 ## Getting started
-1. Install Motion and configure it by editing file __motion.conf__ according to [Motion configuration](#Motion-configuration). Configuring motion remember about size limitations of sending data to messengers(e.g. Telegram limits sent video to 50M)
-2.  Install NodeJS
+1. Install Motion and configure it by editing file __motion.conf__ according to [Motion configuration](#Motion-configuration)
+2.  Install NodeJS by [NVM](https://github.com/nvm-sh/nvm) or by your Linux package manager
 3. Download the project
-4. Edit file resources/motion.yml in the project directory. See [this](#Motion-settings-of-the-project) 
-5. Create Telegram bot and take its API token. See [this](https://core.telegram.org/bots#6-botfather)
-6. Add the taken API token to the __resources/io.yml__[(Telegram bot settings)](#Telegram-bot-settings-of-the-project)
-7. From project's directory run: `npm start &`
-8. From the created Telegram bot send text *hello* [(Telegram bot commands)](#Telegram-bot-commands)
-9. For stopping/starting motion detecting use commands *start/stop* 
-10. To stop run: `npm stop`
+4. In the __resources/motion.conf__ is the configuration file of Motion used in the project. If you camera device file is not /dev/video0, update the value of __videodevice__ in the file. 
+More information about the configuration file can be found [here](https://motion-project.github.io/motion_config.html). The [values](#Motion-configuration-variables-used-in-the-project) of the file used in the project  
+5. Edit file __resources/detections.yml__ in the project directory. See [this](#Detections-settings-of-the-project) 
+6. Create Telegram bot and take its API token. See [this](https://core.telegram.org/bots#6-botfather)
+7. Add the taken API token to the __resources/io.yml__[(Telegram bot settings)](#Telegram-bot-settings-of-the-project)
+8. From project's directory run: `npm start &`
+9. From the created Telegram bot send text *hello* [(Telegram bot commands)](#Telegram-bot-commands)
+10. For stopping/starting motion detecting use commands *start/stop* 
+11. To stop run: `npm stop`
 
-## Motion configuration
-After install, Motion's config file usually is in __${MOTION_CONF_PATH}/motion.conf__, where *${MOTION_CONF_PATH}* is __.motion__ directory in the directory of your current user(`$HOME/.motion`). In the __motion.conf__ the values of the next variables should be set:
-- *process_id_file* - __${MOTION_CONF_PATH}/motion.pid__ (change ${MOTION_CONF_PATH} by the real path)
-- *logfile* - __${MOTION_CONF_PATH}/log/motion.log__
-- *videodevice* - Path to your camera device, usually it is /dev/video0 (if there is only one camera)
-- *max_movie_time* - Maximal time in seconds of created movie. Shouldn't be too long, 10 seconds is pretty enough
-- *output_pictures* - If you don't want to get notifications with pictures(only videos), set it __off__
-- *ffmpeg_output_movies* - If you want to get notifications with videos only, set it __on__
-- *ffmpeg_video_codec* - For Telegram __mp4__(others haven't checked)
-- *target_dir* - Directory for saving images/videos of motion detections, set it __${MOTION_CONF_PATH}/detections__
-- *on_movie_start* - Set it __rm -f /tmp/video.finished__
-- *on_movie_end* - Set it __touch /tmp/video.finished__ 
 
-## Motion settings of the project
-The settings are in the file __resources/motion.yml__
+## Detections settings of the project
+The settings are in the file __resources/detections.yml__
 #### Paths:
 - *motion* - path to the motion program(use command `which motion`)
 -  *conf_dir* - path to the config directory of motion (usually *.motion* in the user's directory, see [Motion configuration](#Motion-configuration))
@@ -69,6 +59,27 @@ The settings are in the file __resources/io.yml__. The file contains different I
 *  *start* - start detecting motions
 *  *stop* - stop detecting motions 
 *  *hello* - initialize connection to bot(use just after creating bot)
+
+## Motion configuration variables used in the project
+Be careful with editing of the variables it can affect program's run
+- *process_id_file* - __motion/motion.pid__ (change ${MOTION_CONF_PATH} by the real path)
+- *logfile* - __motion/log/motion.log__
+- *videodevice* - Path to your camera device, usually it is /dev/video0 (if there is only one camera)
+- *max_movie_time* - Maximal time in seconds of created movie. Shouldn't be too long, 10 seconds is pretty enough
+- *output_pictures* - If you don't want to get notifications with pictures(only videos), set it __off__
+- *ffmpeg_output_movies* - If you want to get notifications with videos only, set it __on__
+- *ffmpeg_video_codec* - For Telegram __mp4__(others haven't checked)
+- *target_dir* - Directory for saving images/videos of motion detections, set it __motion/detections__
+- *on_movie_start* - Set it __rm -f /tmp/video.finished__
+- *on_movie_end* - Set it __touch /tmp/video.finished__ 
+
+## How does it work?
+The program starts Motion as a child process, the Motion uses __motion__ directory in the project for logging and saving detection files(images/videos). Motion uses its config file __resources/motion.conf__. Configuration of detections is in __resources/detections.yml__
+If there are detection files in the __motion__ directory, the files will be sent to the messenger configured in __resources/io.yml__
+
+## If it has stuck
+Try `npm stop` or from the directory __bin__ `./stop.sh`
+If it is still stuck `killall motion; killall node`
 
 ## Planned features
 * Auto stop/start of motion detecting by pinging of user's phone device (E.g. if the device isn't reachable then detecting will be started)

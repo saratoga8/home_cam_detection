@@ -2,7 +2,7 @@ const yaml = require('js-yaml')
 const fs = require('fs')
 const { spawn, spawnSync } = require('child_process')
 
-const config_path = 'resources/motion.yml'
+const config_path = 'resources/detections.yml'
 let childProcess = null
 
 

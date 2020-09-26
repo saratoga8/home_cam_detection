@@ -12,7 +12,7 @@ const {After, Before} = require('cucumber');
 const fs = require('fs')
 
 
-const motionConf = { path: 'resources/motion.yml', copyPath:  '/tmp/motion.yml'}
+const motionConf = { path: 'resources/detections.yml', copyPath:  '/tmp/detections.yml'}
 const ioConf = { path: 'resources/io.yml', copyPath:  '/tmp/io.yml'}
 
 
