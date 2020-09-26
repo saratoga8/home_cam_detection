@@ -1,3 +1,4 @@
+@wip
 Feature: Install/Uninstall the program
 
   Scenario: Installing the program

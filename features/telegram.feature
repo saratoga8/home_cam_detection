@@ -1,3 +1,4 @@
+@wip
 Feature: Using telegram bot for controlling detection process
 
   Scenario: Getting detections

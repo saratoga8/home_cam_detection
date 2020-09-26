@@ -118,3 +118,5 @@ exports.start = start
 exports.cleanDir = cleanDir
 /** String of detections event */
 exports.eventStr = eventStr
+/** Path to the directory containing detections (videos/images) */
+exports.dirPath = dirPath
