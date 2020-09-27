@@ -29,12 +29,10 @@ Given('There are no detections in directory', function () {
 })
 
 When(/^User stops motion detecting by program$/, function () {
-    sleep(2)
     this.childProc.stdin.write("stop\r")
-    sleep(2)
+    sleep(1)
     expect(file(this.program.outputPath)).to.contain("OK")
     expect(file(this.program.outputPath)).to.contain("Stopping motion")
-    sleep(5)
 })
 
 

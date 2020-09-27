@@ -17,7 +17,7 @@ The project tested with:
 - Connected camera
 
 ## Getting started
-1. Install Motion and configure it by editing file __motion.conf__ according to [Motion configuration](#Motion-configuration)
+1. Install Motion 
 2.  Install NodeJS by [NVM](https://github.com/nvm-sh/nvm) or by your Linux package manager
 3. Download the project
 4. In the __resources/motion.conf__ is the configuration file of Motion used in the project. If you camera device file is not /dev/video0, update the value of __videodevice__ in the file. 
@@ -35,11 +35,10 @@ More information about the configuration file can be found [here](https://motion
 The settings are in the file __resources/detections.yml__
 #### Paths:
 - *motion* - path to the motion program(use command `which motion`)
--  *conf_dir* - path to the config directory of motion (usually *.motion* in the user's directory, see [Motion configuration](#Motion-configuration))
--  *detections_dir* - path to the directory containing detections information(value of *target_dir* from [Motion configuration](#Motion-configuration))
 #### Extensions:
 - *img* - Extension of image files with detections, same as in __motion.conf__
 -  *video* - Extension of video files with detections(depends on supported by Motion and the messenger. E.g. Telegram support only MP4), same as in __motion.conf__
+####
 -  *max_saved_imgs* - Directory of detections is being cleaned periodically. All files removed except the given number of the oldest ones
 -  *max_saved_videos* - The same as the previous, just for video files
 -  *new_imgs_threshold* - Notification will be sent only if there are number of detection images more then the given threshold

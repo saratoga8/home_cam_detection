@@ -2,16 +2,12 @@ const chai = require('chai')
 const spies = require('chai-spies')
 const expect = chai.expect
 const assert = chai.assert
-const fs = require('fs')
 
 chai.use(spies)
 const controller = require('../src/controller')
 const EventEmitter = require("events")
 const commands = require('../src/commands')
 const io = require('../src/ios/io')
-
-
-const {sleep} = require('sleep')
 
 
 describe('IO', () => {

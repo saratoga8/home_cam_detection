@@ -1,29 +1,33 @@
 const motion = require('../src/motion')
 const chai = require('chai')
-const assert = chai.assert
 const controller = require('../src/controller')
 const commands = require('../src/commands')
-const testUtils = require('./utils')
-const { isRunning, killMotion, isStopped } = require('./motion')
 
 const EventEmitter = require("events")
 
 
-const {addImgFiles, detectionsDirPath, newImgsTrashHold} = require('./utils')
+const {setMotionEmulator} = require('./utils')
 const detections = require('../src/detections')
 
 const spies = require('chai-spies')
 const expect = chai.expect
 
+const fs = require('fs')
+const motionPath = require('js-yaml').safeLoad(fs.readFileSync('resources/detections.yml', 'utf8')).paths.motion
+
 
 chai.use(spies)
 const io = require('../src/ios/io')
 
-const {sleep} = require('sleep')
-
 let emitter = null
 
 describe('Controller', () => {
+    before(() => { setMotionEmulator('test/resources/motion.sh') })
+    after(() => { setMotionEmulator(motionPath) })
+    afterEach(() => { chai.spy.restore(console) })
+    beforeEach(() => { chai.spy.on(console, ['error', 'log', 'warn']) })
+
+
     after(() => { motion.stop() })
     afterEach( function() { chai.spy.restore(io.ios.CLI.out) })
     beforeEach('Kill motion', function() {
@@ -34,17 +38,17 @@ describe('Controller', () => {
 
     it('Controller stops motion', () => {
         motion.start()
-        assert.isTrue(isRunning(), "Running Motion isn't running")
         controller.run(emitter)
         emitter.emit("command", { name: commands.stopMotion.command_name} )
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
+        expect(console.log).to.have.been.called(3).with("Stopping motion").with("OK")
+        expect(console.error).to.have.not.been.called
     })
 
     it('Controller starts motion', () => {
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
         controller.run(emitter)
         emitter.emit("command", { name: commands.startMotion.command_name} )
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isRunning), "Running Motion hasn't started")
+        expect(console.log).to.have.been.called(1).with("Starting motion")
+        expect(console.error).to.have.not.been.called
     })
 
     it('Controller detected motion', () => {

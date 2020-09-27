@@ -2,38 +2,24 @@ const yaml = require('js-yaml')
 const config_path = 'resources/detections.yml'
 const fs = require('fs')
 const motion = require('../src/motion')
-const {execSync, exec} = require('child_process')
 const chai = require('chai')
 const assert = chai.assert
+const expect = chai.expect
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 const motionPath = conf.paths.motion
-const testUtils = require('./utils')
-const should = chai.should()
 chai.use(require("chai-events"));
 chai.use(require('chai-as-promised'))
 
-function isRunning() {
-    const result = execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
-    return result !== undefined
-}
+const spies = require('chai-spies')
+chai.use(spies)
 
-function isStopped() {
-    const result = execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
-    return result === undefined || result.includes("motion <defunct>")
-}
-
-const killMotion = () => {
-    try {
-        const result = execSync('ps -e').toString().split('\n').find(str => str.includes("motion"))
-        if(result !== undefined)
-            execSync('killall motion')
-    } catch (e) {
-        console.error("Can't kill motion")}
-}
+const {setMotionEmulator} = require('./utils')
 
 describe('Motion use', () => {
-    after(() => { motion.stop() })
-    beforeEach('Kill motion', () => { motion.stop() })
+    before(() => { setMotionEmulator('test/resources/motion.sh') })
+    after(() => { setMotionEmulator(motionPath) })
+    afterEach(() => { chai.spy.restore(console) })
+    beforeEach(() => { chai.spy.on(console, ['error', 'log', 'warn']) })
 
     it("Motion hasn't installed", async () => {
         conf.paths.motion = "/bla/bla"
@@ -45,46 +31,42 @@ describe('Motion use', () => {
     })
 
     it("Motion starting and stopping", () => {
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
         motion.start()
-        assert.isTrue(isRunning(), "Running Motion hasn't started")
+        expect(console.log).to.have.been.called.once.with("Starting motion")
         motion.stop()
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
+        expect(console.log).to.have.been.called(2).with("Stopping motion")
+        expect(console.error).to.have.not.been.called
     })
 
     it("Motion re-start", () => {
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
         motion.start()
-        assert.isTrue(isRunning(), "Running Motion hasn't started")
+        expect(console.log).to.have.been.called.once.with("Starting motion")
         motion.stop()
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
+        expect(console.log).to.have.been.called(2).with("Stopping motion")
         motion.start()
-        assert.isTrue(isRunning(), "Running Motion hasn't re-started")
+        expect(console.log).to.have.been.called(3).with("Starting motion")
         motion.stop()
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
+        expect(console.log).to.have.been.called(4).with("Stopping motion")
+        expect(console.error).to.have.not.been.called
     })
 
     it("Motion repeated starting", () => {
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
         motion.start()
-        assert.isTrue(isRunning(), "Running Motion hasn't started")
         motion.start()
-        assert.isTrue(isRunning(), "Running Motion hasn't re-started")
+        expect(console.log).to.have.been.called(3).with("Starting motion")
+        expect(console.log).to.have.been.called(3).with("Stopping motion")
+        expect(console.warn).to.have.been.called(1).with("Killing previous instance of motion")
         motion.stop()
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
+        motion.stop()
+        expect(console.log).to.have.been.called(4)
+        expect(console.error).to.have.not.been.called
     })
 
     it("Motion repeated stopping", () => {
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
         motion.start()
-        assert.isTrue(isRunning(), "Running Motion hasn't started")
         motion.stop()
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
         motion.stop()
-        assert.isFulfilled(testUtils.waitUntil(2, 100, isStopped), "Running Motion hasn't stopped")
+        expect(console.log).to.have.been.called(2).with("Stopping motion")
+        expect(console.error).to.have.not.been.called
     })
 })
-
-exports.killMotion = killMotion
-exports.isRunning = isRunning
-exports.isStopped = isStopped

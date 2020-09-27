@@ -3,6 +3,7 @@ Feature: Motion detecting by program
   Background:
     Given There are no detections in directory
     When User starts program with io CLI
+    And User sets time between detections 2s
 
   Scenario Outline: User starts motions detecting
     And There are detections with number <sign> than threshold
@@ -28,10 +29,11 @@ Feature: Motion detecting by program
     Then Program DOES detect motion
 
   Scenario: Detection periods don't depend on each other
-    And User sets time between detections 2s
     And There are detections with number less than threshold
-    Then Program DOESN'T detect motion
-    When There are detections with number less than threshold
-    Then Program DOESN'T detect motion
-    When There are detections with number less than threshold
+    And Program DOESN'T detect motion
+    And Sleep 4s
+    And There are detections with number less than threshold
+    And Program DOESN'T detect motion
+    And Sleep 4s
+    And There are detections with number less than threshold
     Then Program DOESN'T detect motion

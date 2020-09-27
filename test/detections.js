@@ -1,6 +1,5 @@
 const detections = require('../src/detections')
 const {execSync} = require('child_process')
-const fs = require('fs')
 
 const chai = require('chai')
 const assert = chai.assert
@@ -11,8 +10,6 @@ const EventEmitter = require("events");
 const emitter = new EventEmitter()
 const {addImgFiles, maxSavedImgs, detectionsDirPath, newImgsTrashHold} = require('./utils')
 
-const {sep} = require('path')
-const {sleep, msleep} = require('sleep')
 
 describe('Detections use', async () => {
     it('start detecting', async () => {

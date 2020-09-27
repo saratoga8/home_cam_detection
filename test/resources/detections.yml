@@ -1,0 +1,9 @@
+paths:
+  motion: /usr/bin/motion
+extensions:
+  img: jpg
+  video: mp4
+max_saved_imgs: 10
+max_saved_videos: 1
+new_imgs_threshold: 15
+seconds_between_detections: 10

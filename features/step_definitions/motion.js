@@ -18,7 +18,7 @@ When(/^There are detections with number (more|less) than threshold$/, function (
     assert.pathExists(detectionsDirPath, "There is no directory of detections")
     const imgsNum = Math.round((action == 'more') ? newImgsTrashHold() + 2 : newImgsTrashHold() / 2)
     addImgFiles(detectionsDirPath, imgsNum)
-    sleep(3)
+    sleep(1)
 });
 
 Then(/^Program (DOES|DOESN'T) detect motion$/, function (action) {

@@ -18,7 +18,19 @@ const chaiFiles = require('chai-files')
 chai.use(chaiFiles);
 const file = chaiFiles.file
 
+const yaml = require('js-yaml')
+var {Given} = require('cucumber');
+
+function setMotionEmulator() {
+    const configPath = 'resources/detections.yml'
+    const conf = yaml.safeLoad(fs.readFileSync(configPath, 'utf8'))
+    conf.paths.motion = path.resolve('test/resources/motion.sh')
+    fs.writeFileSync(configPath, yaml.safeDump(conf), 'utf8')
+}
+
 When(/^User starts program with io (CLI|TELEGRAM)$/, function (io) {
+    setMotionEmulator()
+
     const dirPath = utils.projectPath() + path.sep + 'bin'
     const filePath = dirPath + path.sep + 'start.sh'
     expect(file(filePath)).to.exist
@@ -33,3 +45,6 @@ When(/^User starts program with io (CLI|TELEGRAM)$/, function (io) {
     expect(file(this.program.outputPath)).to.contain("Starting motion")
 })
 
+When('Sleep {int}s', function (seconds) {
+    sleep(seconds)
+});
