@@ -19,7 +19,7 @@ The project tested with:
 ## Getting started
 1. Install Motion 
 2.  Install NodeJS by [NVM](https://github.com/nvm-sh/nvm) or by your Linux package manager
-3. Download the project
+3. Download the project and install it from its directory `npm install --only=prod`
 4. In the __resources/motion.conf__ is the configuration file of Motion used in the project. If you camera device file is not /dev/video0, update the value of __videodevice__ in the file. 
 More information about the configuration file can be found [here](https://motion-project.github.io/motion_config.html). The [values](#Motion-configuration-variables-used-in-the-project) of the file used in the project  
 5. Edit file __resources/detections.yml__ in the project directory. See [this](#Detections-settings-of-the-project) 
@@ -32,11 +32,11 @@ More information about the configuration file can be found [here](https://motion
 
 
 ## Detections settings of the project
-The settings are in the file __resources/detections.yml__
+The settings are in the file __resources/detections.yml__. Except __motion__ all the values are default and can be left as they are
 #### Paths:
 - *motion* - path to the motion program(use command `which motion`)
 #### Extensions:
-- *img* - Extension of image files with detections, same as in __motion.conf__
+- *img* - Extension of image files with detections, same as in __motion.conf__ 
 -  *video* - Extension of video files with detections(depends on supported by Motion and the messenger. E.g. Telegram support only MP4), same as in __motion.conf__
 ####
 -  *max_saved_imgs* - Directory of detections is being cleaned periodically. All files removed except the given number of the oldest ones
@@ -45,11 +45,11 @@ The settings are in the file __resources/detections.yml__
 -  *seconds_between_detections* - Time between detections. In the case of multiple detections(e.g. smth. moves constantly against camera), to avoid constant notifications there is period of delay between detections. E.g. detections of 15 images will be sent every 2 seconds 
 
 ## Telegram bot settings of the project
-The settings are in the file __resources/io.yml__. The file contains different Input/Output instances for notifications. E.g. Telegram or CLI(for tests only). Only one instance should be used per run
+The settings are in the file __resources/io.yml__. The file contains different Input/Output instances for notifications. E.g. Telegram or CLI(for tests only). Only one instance should be used
 #### Telegram:
 - *use* - Should the instance be used for notification (value: __yes__/__no__)
 - *token* - API token of created Telegram bot
-- *msg_type* - type of notification message(value: __image__/__video__)
+- *msg_type* - type of notification message(value: __image__/__video__) (For weak computers, like Raspberry Pi or slow connections __image__ should be used)
 #### Cli (for tests only): 
 - *use* - Should the instance be used for notification (value: __yes__/__no__)
 
