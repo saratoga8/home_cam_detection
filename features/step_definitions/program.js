@@ -19,7 +19,7 @@ chai.use(chaiFiles);
 const file = chaiFiles.file
 
 const yaml = require('js-yaml')
-var {Given} = require('cucumber');
+const {Given} = require('cucumber');
 
 function setMotionEmulator() {
     const configPath = 'resources/detections.yml'

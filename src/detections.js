@@ -76,7 +76,7 @@ function start(emitter) {
         }
     })
     fs.watch('/tmp', {persistent: false}, (event, fileName) => {
-        if (event == 'rename' && fileName == 'video.finished') {
+        if (event === 'rename' && fileName === 'video.finished') {
             const path = sortPaths(paths(videoExt))[0]
             const data = Object.create(sentData.types.VIDEO)
             data.path = path
@@ -107,9 +107,9 @@ function sortPaths(paths) {
  */
 function delFiles(fileExtension, maxSavedFiles) {
     const sorted = sortPaths(paths(fileExtension))
-    const del_elements_num = sorted.length - maxSavedFiles
-    if(del_elements_num > 0)
-        sorted.slice(sorted.length - del_elements_num).forEach(fs.unlinkSync)
+    const delElementsNum = sorted.length - maxSavedFiles
+    if(delElementsNum > 0)
+        sorted.slice(sorted.length - delElementsNum).forEach(fs.unlinkSync)
 }
 
 /** Start detections */

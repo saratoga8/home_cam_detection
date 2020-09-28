@@ -1,7 +1,7 @@
 const motion = require('./motion')
 const process = require('process');
-process.env["NTBA_FIX_350"] = 1
-process.env["NTBA_FIX_319"] = 1
+process.env["NTBA_FIX_350"] = '1'
+process.env["NTBA_FIX_319"] = '1'
 const fs = require('fs')
 const controller = require('./controller')
 const detections = require('../src/detections')
@@ -24,7 +24,7 @@ process.on('SIGTERM', () => {
 })
 
 if(motion.hasInstalled()) {
-    if(pid_path != undefined) {
+    if(pid_path !== undefined) {
         fs.writeFile(pid_path, process.pid.toString(), err => {
             if (err) {
                 console.error(`Can't write PID to the file ${pid_path}: ${err.message}`)

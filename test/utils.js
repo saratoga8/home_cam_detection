@@ -36,10 +36,10 @@ exports.addImgFiles = (path, num) => {
 const path = require('path')
 
 exports.setMotionPath = (emulatorPath) => {
-    const config_path = 'resources/detections.yml'
-    const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
+    const configPath = 'resources/detections.yml'
+    const conf = yaml.safeLoad(fs.readFileSync(configPath, 'utf8'))
     conf.paths.motion = path.resolve(emulatorPath)
-    fs.writeFileSync(config_path, yaml.safeDump(conf), 'utf8')
+    fs.writeFileSync(configPath, yaml.safeDump(conf), 'utf8')
 }
 
 exports.waitUntil = waitUntil
