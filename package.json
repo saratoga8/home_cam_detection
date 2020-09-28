@@ -1,7 +1,7 @@
 {
   "name": "home_cam_detection",
   "version": "1.0.0",
-  "description": "Motion detection by a video cam and notification user",
+  "description": "Detecting motion by camera and notifying user",
   "main": "src/main.js",
   "scripts": {
     "test": "mocha --exit",
@@ -44,5 +44,6 @@
   "bugs": {
     "url": "https://github.com/saratoga8/home_cam_detection/issues"
   },
-  "homepage": "https://github.com/saratoga8/home_cam_detection#readme"
+  "homepage": "https://github.com/saratoga8/home_cam_detection#readme",
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" }
 }
