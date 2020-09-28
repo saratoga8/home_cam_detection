@@ -7,11 +7,18 @@ const should = chai.should()
 chai.use(require("chai-events"));
 const EventEmitter = require("events");
 
+const fs = require('fs')
+
 const emitter = new EventEmitter()
 const {addImgFiles, maxSavedImgs, detectionsDirPath, newImgsTrashHold} = require('./utils')
 
 
 describe('Detections use', async () => {
+    beforeEach( () => {
+        if(!fs.existsSync('motion'))
+            fs.mkdirSync('motion/detections', {recursive: true})
+    } )
+
     it('start detecting', async () => {
         detections.cleanDir()
         detections.start(emitter)

@@ -10,16 +10,23 @@ const motionPath = conf.paths.motion
 chai.use(require("chai-events"));
 chai.use(require('chai-as-promised'))
 
+const chaiFiles = require('chai-files')
+chai.use(chaiFiles);
+const file = chaiFiles.file
+
+
 const spies = require('chai-spies')
 chai.use(spies)
 
-const {setMotionEmulator} = require('./utils')
+const {setMotionPath} = require('./utils')
 
 describe('Motion use', () => {
-    before(() => { setMotionEmulator('test/resources/motion.sh') })
-    after(() => { setMotionEmulator(motionPath) })
-    afterEach(() => { chai.spy.restore(console) })
-    beforeEach(() => { chai.spy.on(console, ['error', 'log', 'warn']) })
+    after(() => { setMotionPath(motionPath) })
+    afterEach(function () { chai.spy.restore(console) })
+    beforeEach(function ()  {
+        chai.spy.on(console, ['error', 'log', 'warn'])
+        setMotionPath('test/resources/motion.sh')
+    })
 
     it("Motion hasn't installed", async () => {
         conf.paths.motion = "/bla/bla"

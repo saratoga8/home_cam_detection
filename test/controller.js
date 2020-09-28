@@ -6,7 +6,7 @@ const commands = require('../src/commands')
 const EventEmitter = require("events")
 
 
-const {setMotionEmulator} = require('./utils')
+const {setMotionPath} = require('./utils')
 const detections = require('../src/detections')
 
 const spies = require('chai-spies')
@@ -22,18 +22,16 @@ const io = require('../src/ios/io')
 let emitter = null
 
 describe('Controller', () => {
-    before(() => { setMotionEmulator('test/resources/motion.sh') })
-    after(() => { setMotionEmulator(motionPath) })
-    afterEach(() => { chai.spy.restore(console) })
-    beforeEach(() => { chai.spy.on(console, ['error', 'log', 'warn']) })
-
-
-    after(() => { motion.stop() })
-    afterEach( function() { chai.spy.restore(io.ios.CLI.out) })
-    beforeEach('Kill motion', function() {
+    before(function ()  { setMotionPath('test/resources/motion.sh') })
+    after(function ()  { setMotionPath(motionPath) })
+    afterEach(function ()  {
+        chai.spy.restore(console)
+        chai.spy.restore(io.ios.CLI.out)
+    })
+    beforeEach(function ()  {
         emitter = new EventEmitter()
         chai.spy.on(io.ios.CLI.out, ['send'])
-        motion.stop()
+        chai.spy.on(console, ['error', 'log', 'warn'])
     })
 
     it('Controller stops motion', () => {
