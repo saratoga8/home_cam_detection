@@ -2,4 +2,5 @@ cli:
   use: no
 telegram:
   use: yes
+  msg_type: video
   token: bla-bla
