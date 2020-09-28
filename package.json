@@ -4,7 +4,7 @@
   "description": "Motion detection by a video cam and notification user",
   "main": "src/main.js",
   "scripts": {
-    "test": "mocha --exit && cucumber-js features/*.feature -t 'not @wip'",
+    "test": "mocha --exit",
     "start": "node src/main.js --pid_path=bin/.pid",
     "stop": "cd bin && ./stop.sh && cd .."
   },

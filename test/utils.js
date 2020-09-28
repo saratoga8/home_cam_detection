@@ -35,7 +35,7 @@ exports.addImgFiles = (path, num) => {
 
 const path = require('path')
 
-exports.setMotionEmulator = (emulatorPath) => {
+exports.setMotionPath = (emulatorPath) => {
     const config_path = 'resources/detections.yml'
     const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
     conf.paths.motion = path.resolve(emulatorPath)
