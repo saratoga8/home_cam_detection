@@ -1,6 +1,17 @@
 Detecting a motion by camera and notifying user
 ===================
 Regular camera can be connected to you computer and used for detecting any motion. When motion detected, notification will be sent to the user by messenger(e.g. Telegram or Slack)
+It can be run on any computer with Linux OS. The optimal case is to run on a single board computer like Raspberry Pi
+
+Table of contents
+* [Used technologies](#Technologies)
+* [Requirements](#Requirements)
+* [Getting started](#Getting-started)
+* [How to run in Docker?](#How-to-run-in-Docker)
+* [How does it work?](#How-does-it-work?)
+* [If it has stuck](#If-it-has-stuck)
+* [Planned features](#Planned-features)
+
 
 ## Technologies
 The project developed with:
@@ -71,6 +82,18 @@ Be careful with editing of the variables it can affect program's run
 - *target_dir* - Directory for saving images/videos of motion detections, set it __motion/detections__
 - *on_movie_start* - Set it __rm -f /tmp/video.finished__
 - *on_movie_end* - Set it __touch /tmp/video.finished__ 
+
+## How to run in Docker?
+From the directory of the project build the docker image: 
+```
+docker build -t ${IMG_NAME} .
+docker run -d --device=${VIDEO_DEV_PATH}:/dev/video0 --name ${CONTAINER_NAME} -ti ${IMG_NAME}
+docker exec -ti ${CONTAINER_NAME} bash
+```
+*${VIDEO_DEV_PATH}* - path to the video device(e.g. /dev/video0)
+*${IMG_NAME}* - name of docker image
+*${CONTAINER_NAME}* - name of docker container
+
 
 ## How does it work?
 The program starts Motion as a child process, the Motion uses __motion__ directory in the project for logging and saving detection files(images/videos). Motion uses its config file __resources/motion.conf__. Configuration of detections is in __resources/detections.yml__
