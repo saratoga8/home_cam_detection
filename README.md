@@ -1,6 +1,7 @@
+# Detecting a motion by camera and notifying user
+
 [![](https://github.com/saratoga8/home_cam_detection/workflows/Node.js%20CI/badge.svg)](https://github.com/saratoga8/home_cam_detection/actions?query=workflow%3A%22Node.js+CI%22)
-Detecting a motion by camera and notifying user
-===================
+
 Regular camera can be connected to you computer and used for detecting any motion. When motion detected, notification will be sent to the user by messenger(e.g. Telegram or Slack)
 It can be run on any computer with Linux OS. The optimal case is to run on a single board computer like Raspberry Pi
 
