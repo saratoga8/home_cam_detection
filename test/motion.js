@@ -76,4 +76,21 @@ describe('Motion use', () => {
         expect(console.log).to.have.been.called(2).with("Stopping motion")
         expect(console.error).to.have.not.been.called
     })
+
+    it("delete it", () => {
+        const smth = new Delete()
+        smth.shit = "dermo"
+        console.log(smth.shit)
+    })
 })
+
+
+class Delete {
+    #shit = "shit"
+    constructor() {
+        this.bla = "test"
+    }
+
+    get shit() { return this.#shit }
+    set shit(str) { this.#shit = str }
+}
