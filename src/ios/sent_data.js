@@ -1,3 +1,5 @@
+/** @module sent_data */
+
 exports.types = {
     IMAGES: {name: "images", paths: ""},
     VIDEO: {name: "video", path: ""},

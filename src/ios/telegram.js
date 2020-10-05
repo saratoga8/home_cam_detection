@@ -1,3 +1,5 @@
+/** @module telegram */
+
 const commands = require('../commands')
 const yaml = require('js-yaml')
 const fs = require('fs')
@@ -134,7 +136,7 @@ function receiveBotErr() {
 
 /**
  * Send pictures to Telegram bot
- * @param {Object} data Object containing name of the sent data and paths of images {@link ./sent_data}
+ * @param {Object} data Object containing name of the sent data and paths of images {@link sent_data}
  */
 function sendPics(data) {
     if(data.name.startsWith(mediaMsgType())) {
@@ -152,7 +154,7 @@ function sendTxt(data) {  ///////// TODO Should be replaced by using sendMsg(txt
 
 /**
  * Send video message to Telegram bot
- * @param {Object} data Object containing name of the sent data and paths of images {@link ./sent_data}
+ * @param {Object} data Object containing name of the sent data and paths of images {@link sent_data}
  * @param minFileSizeByte The size of the sent video should be more then the given minimal size in bytes
  */
 function sendVideo(data, minFileSizeByte) {
@@ -184,7 +186,7 @@ function initBot() {
 
 /**
  * Send detections to Telegram bot
- * @param {Object} data Object containing name of the sent data and paths of images {@link ./sent_data}
+ * @param {Object} data Object containing name of the sent data and paths of images {@link sent_data}
  */
 function sendDetections(data) {
     if (bot == null) initBot()
