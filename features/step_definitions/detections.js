@@ -28,7 +28,7 @@ Given('There are no detections in directory', function () {
     assert.isFulfilled(waitUntil(1, 100, isDirEmpty, "Directory hasn't cleared"))
 })
 
-When(/^User stops motion detecting by program$/, function () {
+When(/^User (stops|starts) motion detecting by (program|telegram)$/, function () {
     this.childProc.stdin.write("stop\r")
     sleep(1)
     expect(file(this.program.outputPath)).to.contain("OK")
@@ -36,7 +36,7 @@ When(/^User stops motion detecting by program$/, function () {
 })
 
 
-When(/^User (increases|decrease) detection threshold$/, function (action) {
+When(/^User (increases|decreases) detection threshold$/, function (action) {
     if(action === 'increases')
         conf.new_imgs_threshold = conf.new_imgs_threshold + 2
     fs.writeFileSync(config_path, yaml.safeDump(conf), 'utf8')

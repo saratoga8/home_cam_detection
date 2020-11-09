@@ -1,20 +1,38 @@
 @wip
 Feature: Using telegram bot for controlling detection process
 
-  Scenario: Getting detections
+  Background:
     Given User has telegram bot
+
+  Scenario: Starting detections
     When User starts program with io TELEGRAM
-    And There are detections with number more than threshold
-    And Program DOES detect motion
-    And User HAS notification of detections
+    And User starts motion detecting by telegram
+    Then User GETS notification of starting
 
   Scenario: Stopping detections
-    Given User has telegram bot
     When User starts program with io TELEGRAM
-    And There are detections with number more than threshold
-    When Program DOES detect motion
-    And User HAS notification of detections
+    And User starts motion detecting by telegram
+    And User GETS notification of starting
     And User stops motion detecting by telegram
+    Then User GETS notification of stopping
+
+  Scenario: Re-starting detections
+    When User starts program with io TELEGRAM
+    And User starts motion detecting by telegram
+    And User GETS notification of starting
+    And User stops motion detecting by telegram
+    And User GETS notification of stopping
+    And User starts motion detecting by telegram
+    Then User GETS notification of starting
+
+  Scenario Outline: Getting images/video of detections
+    And User sets message type <type>
+    When User starts program with io TELEGRAM
+    And User starts motion detecting by telegram
     And There are detections with number more than threshold
-    Then Program DOESN'T detect motion
-    And User HASN'T notification of detections
+    And User GETS notification of detections
+
+    Examples:
+      | type  |
+      | IMAGE |
+      | VIDEO |

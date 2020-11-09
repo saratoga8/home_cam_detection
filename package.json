@@ -31,7 +31,9 @@
     "chai-as-promised": "^7.1.1",
     "sleep": "^6.3.0",
     "cucumber": "^6.0.5",
-    "eslint-plugin-chai-friendly": "^0.6.0"
+    "telegram-test-api": "^2.4.4",
+    "eslint-plugin-chai-friendly": "^0.6.0",
+    "messaging-api-telegram": "^1.0.1"
   },
   "engines": {
     "node": ">=12.0.0"
@@ -45,5 +47,7 @@
     "url": "https://github.com/saratoga8/home_cam_detection/issues"
   },
   "homepage": "https://github.com/saratoga8/home_cam_detection#readme",
-  "publishConfig": { "registry": "https://npm.pkg.github.com/" }
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
 }
