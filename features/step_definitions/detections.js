@@ -28,7 +28,7 @@ Given('There are no detections in directory', function () {
     assert.isFulfilled(waitUntil(1, 100, isDirEmpty, "Directory hasn't cleared"))
 })
 
-When(/^User (stops|starts) motion detecting by (program|telegram)$/, function () {
+When(/^User (stops|starts) motion detecting by (program|telegram)$/, function (action, type) {
     this.childProc.stdin.write("stop\r")
     sleep(1)
     expect(file(this.program.outputPath)).to.contain("OK")

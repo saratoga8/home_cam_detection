@@ -31,9 +31,7 @@
     "chai-as-promised": "^7.1.1",
     "sleep": "^6.3.0",
     "cucumber": "^6.0.5",
-    "telegram-test-api": "^2.4.4",
-    "eslint-plugin-chai-friendly": "^0.6.0",
-    "messaging-api-telegram": "^1.0.1"
+    "eslint-plugin-chai-friendly": "^0.6.0"
   },
   "engines": {
     "node": ">=12.0.0"

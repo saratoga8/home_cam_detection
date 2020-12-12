@@ -12,6 +12,6 @@ COPY package.json package.json
 RUN touch /tmp/stam && rm /tmp/stam
 
 RUN apt-get update && apt-get install -y motion procps
-RUN npm install && npm test
+CMD npm install && npm test
 
 ENTRYPOINT ["/bin/bash"]
