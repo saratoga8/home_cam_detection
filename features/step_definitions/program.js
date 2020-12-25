@@ -35,7 +35,8 @@ When(/^User starts program with io (CLI|TELEGRAM)$/, function (io) {
     const filePath = dirPath + path.sep + 'start.sh'
     expect(file(filePath)).to.exist
 
-    const ioConfPaths= { CLI: { inSrc: 'resources/io.yml', inTest: 'test/resources/ios/cli.yml'}}
+    const ioConfPaths= { CLI: { inSrc: 'resources/io.yml', inTest: 'test/resources/ios/cli.yml'},
+        TELEGRAM: { inSrc: 'resources/io.yml', inTest: 'test/resources/ios/telegram.yml'} }
     fs.copyFileSync(ioConfPaths[io].inTest, ioConfPaths[io].inSrc)
 
     this.program = { outputPath: '/tmp/out.txt', outputFD: fs.openSync('/tmp/out.txt', 'w+') }

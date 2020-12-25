@@ -17,7 +17,7 @@ const chaiFiles = require('chai-files')
 chai.use(chaiFiles);
 const file = chaiFiles.file
 
-
+const telegram = require('../support/telegram-cli')
 
 
 const {Given, When} = require('cucumber')
@@ -28,11 +28,16 @@ Given('There are no detections in directory', function () {
     assert.isFulfilled(waitUntil(1, 100, isDirEmpty, "Directory hasn't cleared"))
 })
 
-When(/^User (stops|starts) motion detecting by (program|telegram)$/, function (action, type) {
-    this.childProc.stdin.write("stop\r")
-    sleep(1)
-    expect(file(this.program.outputPath)).to.contain("OK")
-    expect(file(this.program.outputPath)).to.contain("Stopping motion")
+When(/^User (stop|start)s motion detecting by (program|telegram)$/, function (action, type) {
+    if(type === 'program') {
+        this.childProc.stdin.write(`${action}\r`)
+        sleep(1)
+        expect(file(this.program.outputPath)).to.contain("OK")
+        const txt = { stop: "Stopping motion", start: "Starting motion"}
+        expect(file(this.program.outputPath)).to.contain(txt[action])
+    }
+    if(type === 'telegram')
+        telegram.sendMsg(action)
 })
 
 
