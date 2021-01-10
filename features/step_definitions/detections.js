@@ -37,7 +37,7 @@ When(/^User (stop|start)s motion detecting by (program|telegram)$/, function (ac
         expect(file(this.program.outputPath)).to.contain(txt[action])
     }
     if(type === 'telegram')
-        telegram.sendMsg(action)
+        telegram.sendMsg(action, telegram.botName)
 })
 
 

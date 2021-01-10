@@ -8,7 +8,7 @@ Feature: Using telegram bot for controlling detection process
   Scenario: Starting detections
     When User starts program with io TELEGRAM
     And User starts motion detecting by telegram
-#    Then User GETS notification of starting
+    Then User GETS notification of starting
 
   Scenario: Stopping detections
     When User starts program with io TELEGRAM

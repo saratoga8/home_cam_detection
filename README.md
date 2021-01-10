@@ -101,7 +101,7 @@ docker exec -ti ${CONTAINER_NAME} bash
 The program starts Motion as a child process, the Motion uses __motion__ directory in the project for logging and saving detection files(images/videos). Motion uses its config file __resources/motion.conf__. Configuration of detections is in __resources/detections.yml__
 If there are detection files in the __motion__ directory, the files will be sent to the messenger configured in __resources/io.yml__
 
-## If it has stuck
+## If it has stuck 
 Try `npm stop` or from the directory __bin__ `./stop.sh`
 If it is still stuck `killall motion; killall node`
 

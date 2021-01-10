@@ -1,7 +1,11 @@
 const chai = require('chai')
+    , chaiHttp = require('chai-http')
+chai.use(chaiHttp)
 const spies = require('chai-spies')
 const expect = chai.expect
 const assert = chai.assert
+const chaiExecAsync = require('chai-exec')
+const {execSync} = require('child_process')
 
 chai.use(spies)
 const controller = require('../src/controller')
