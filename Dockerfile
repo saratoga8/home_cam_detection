@@ -8,7 +8,7 @@ COPY resources resources
 COPY src src
 COPY test test
 COPY package.json package.json
-COPY telegram-cli telegram-cli
+COPY .telegram-cli telegram-cli
 
 RUN touch /tmp/stam && rm /tmp/stam
 
