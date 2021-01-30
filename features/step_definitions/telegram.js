@@ -21,6 +21,6 @@ Given(/^User has telegram bot$/, async () => {
     // assert.include(result.output, telegram.botName, `Bot '${telegram.botName}' hasn't found in dialog list in telegram-cli: ${result.output}`)
 })
 Then(/^User GETS notification of starting$/, async () => {
-    const result = execSync(`telegram-cli -W -e "history home_cam 2" | grep home_cam`, {maxBuffer: 1024 * 1024 * 50})
+    const result = execSync(`telegram-cli -DRCW -e "history home_cam 2" | grep home_cam`)
     console.log(result.toString())
 })

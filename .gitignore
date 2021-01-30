@@ -109,3 +109,4 @@ dist
 /.github/
 
 *.del
+/test/resources/home_cam_tlgrm_creds.png
