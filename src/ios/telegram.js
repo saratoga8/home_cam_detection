@@ -5,6 +5,8 @@ const yaml = require('js-yaml')
 const fs = require('fs')
 const api = require('node-telegram-bot-api')
 
+require('dotenv').config()
+
 
 const sent_data = require('./sent_data')
 const confPath = 'resources/io.yml'
@@ -24,12 +26,12 @@ const mediaMsgType = () => {
 /**
  * Load  API Token of Telegram bot
  * @returns {String|undefined} Token string or 'undefined'
- */
+ *
 function loadToken() {
     const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
     const telegram = conf.telegram
     return (telegram !== undefined) ? telegram.token : undefined
-}
+}*/
 
 let chatID = null
 let bot = null
@@ -63,12 +65,12 @@ function setChatID(id) {
 /**
  * Load chat ID of Telegram bot from file
  * @returns {String} ID
- */
+ *
 function loadChatID() {
     const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
     const telegram = conf.telegram
     return telegram.chatID
-}
+}*/
 
 /**
  * Stop motion process
@@ -176,7 +178,7 @@ function sendVideo(data, minFileSizeByte) {
  */
 function initBot() {
     if(bot == null) {
-        const token = loadToken()
+        const token = process.env.TELEGRAM_BOT_TOKEN
         if(token !== undefined)
             bot = new api(token, {polling: true})
         else
@@ -191,7 +193,7 @@ function initBot() {
 function sendDetections(data) {
     if (bot == null) initBot()
     if (chatID == null)
-        chatID = loadChatID()
+        chatID = process.env.TELEGRAM_BOT_CHAT
 
     const actions = {
         [sent_data.types.IMAGES.name]: () => { sendPics(data) },

@@ -1,3 +1,4 @@
+@motion
 Feature: Motion detecting by program
 
   Background:
