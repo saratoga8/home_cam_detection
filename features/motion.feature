@@ -6,6 +6,7 @@ Feature: Motion detecting by program
     When User starts program with io CLI
     And User sets time between detections 2s
 
+    @current
   Scenario Outline: User starts motions detecting
     And There are detections with number <sign> than threshold
     Then Program <action> detect motion
@@ -13,7 +14,7 @@ Feature: Motion detecting by program
     Examples:
       | action  | sign |
       | DOES    | more |
-      | DOESN'T | less |
+#      | DOESN'T | less |
 
   Scenario: User stops motion detecting
     And There are detections with number more than threshold

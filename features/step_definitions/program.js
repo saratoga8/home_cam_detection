@@ -11,7 +11,7 @@ const utils = require('../support/utils')
 const fs = require('fs')
 const {waitUntil} = require('../../test/utils')
 
-const {When} = require('cucumber');
+const {When, Then} = require('@cucumber/cucumber');
 const {sleep} = require('sleep')
 
 const chaiFiles = require('chai-files')
@@ -19,7 +19,8 @@ chai.use(chaiFiles);
 const file = chaiFiles.file
 
 const yaml = require('js-yaml')
-const {Given} = require('cucumber');
+
+
 
 function setMotionEmulator() {
     const configPath = 'resources/detections.yml'
@@ -42,10 +43,13 @@ When(/^User starts program with io (CLI|TELEGRAM)$/, function (io) {
     this.program = { outputPath: '/tmp/out.txt', outputFD: fs.openSync('/tmp/out.txt', 'w+') }
     this.childProc = spawn('node', [`${utils.projectPath()}/src/main.js`, `--pid_path=${dirPath}/.pid`], {stdio: [null, this.program.outputFD, process.stderr]})
     this.childProc.stdin.pipe(process.stdin)
-    sleep(1)
-    expect(file(this.program.outputPath)).to.contain("Starting motion")
 })
 
 When('Sleep {int}s', function (seconds) {
     sleep(seconds)
 });
+
+Then(/^The program has started$/, function () {
+    sleep(1)
+    expect(file(this.program.outputPath)).to.contain("Starting motion")
+})

@@ -18,9 +18,7 @@ chai.use(chaiFiles);
 const file = chaiFiles.file
 
 const telegram = require('../support/telegram-cli')
-
-
-const {Given, When} = require('cucumber')
+const {Given, When, Then} = require('@cucumber/cucumber')
 
 Given('There are no detections in directory', function () {
     execSync(`rm -rf ${detectionsDirPath}/*.*`)
@@ -56,3 +54,8 @@ When(/^User deletes all files of detections$/, function () {
     assert.pathExists(detectionsDirPath, "There is no directory of detections")
     execSync(`rm -rf ${detectionsDirPath}/*.*`)
 })
+
+Then('The time between detections is {int}s', function (seconds) {
+    const actual = yaml.safeLoad(fs.readFileSync(config_path, 'utf8')).seconds_between_detections
+    assert.strictEqual(actual, seconds, `The file ${config_path} has invalid value of the time between detections`)
+});

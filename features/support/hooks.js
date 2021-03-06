@@ -3,7 +3,7 @@ chai.use(require('chai-fs'))
 const chaiExec = require('chai-exec')
 chai.use(chaiExec);
 
-const {After, Before} = require('cucumber');
+const {After, Before} = require('@cucumber/cucumber');
 
 const fs = require('fs')
 

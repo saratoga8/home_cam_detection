@@ -48,6 +48,36 @@ function paths(fileExtension) {
         .map(file => dirPath.concat(sep, file))
 }
 
+function emitEventWithLastImgsPaths(emitter) {
+    const data = Object.create(sentData.types.IMAGES)
+    data.paths = sortPaths(paths(imgExt)).slice(0, count)
+    emitter.emit(eventStr, data)
+}
+
+function processImg(emitter, fileName) {
+    console.log(`Count: ${count}`)
+    if (fileName.endsWith(`.${imgExt}`)) {
+        console.log(`${(toNowSeconds() - lastDetectionDate)} > ${minTimeBetweenDetectionsSeconds}`)
+        if ((toNowSeconds() - lastDetectionDate) > minTimeBetweenDetectionsSeconds) {
+            count = 0
+            lastDetectionDate = toNowSeconds()
+            return
+        }
+        const threshold = newImgsThreshold()
+        console.log(`Threshold: ${threshold}`)
+        if ((threshold !== undefined) && (count >= threshold)) {
+            if(count == threshold) {
+                emitEventWithLastImgsPaths(emitter)
+                count++
+            }
+            else {
+                count = 0
+                cleanDir()
+            }
+        } else count++
+    }
+}
+
 /**
  * Starts detecting: watching for directory of motion's detections for new files.
  * The func counts the new files and after a threshold emits event.
@@ -58,22 +88,8 @@ function paths(fileExtension) {
 function start(emitter) {
     !fs.existsSync(dirPath) && fs.mkdirSync(dirPath, {recursive: true})
     fs.watch(dirPath, {persistent: false}, (event, file) => {
-        if (fs.existsSync(join(dirPath, file))) {
-            if (file.endsWith(`.${imgExt}`)) {
-                if ((toNowSeconds() - lastDetectionDate) > minTimeBetweenDetectionsSeconds) {
-                    count = 0
-                    lastDetectionDate = toNowSeconds()
-                }
-                const threshold = newImgsThreshold()
-                if ((threshold !== undefined) && (count > threshold)) {
-                    const data = Object.create(sentData.types.IMAGES)
-                    data.paths = sortPaths(paths(imgExt)).slice(0, count)
-                    emitter.emit(eventStr, data)
-                    count = 0
-                    cleanDir()
-                } else count++
-            }
-        }
+        if (event === 'rename')
+            processImg(emitter, file)
     })
     fs.watch('/tmp', {persistent: false}, (event, fileName) => {
         if (event === 'rename' && fileName === 'video.finished') {
@@ -85,6 +101,7 @@ function start(emitter) {
         }
     })
 }
+
 
 
 /**

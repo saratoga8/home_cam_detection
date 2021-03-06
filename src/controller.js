@@ -1,6 +1,7 @@
 const commands = require('./commands')
 const detections = require('./detections')
 const cli = require('./ios/cli')
+const {eventMsgSent} = require('./ios/io')
 
 /**
  * Run controller
@@ -15,6 +16,9 @@ function run(emitter, io = cli.io) {
     })
     emitter.on(detections.eventStr, (data) => {
         io.out.send(data)
+    })
+    emitter.on(eventMsgSent, () => {
+        detections.cleanDir()
     })
 }
 

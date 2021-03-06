@@ -24,18 +24,14 @@ const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 
 exports.maxSavedImgs = conf.max_saved_imgs
 exports.detectionsDirPath = require('../src/detections').dirPath
-exports.newImgsTrashHold = () => yaml.safeLoad(fs.readFileSync(config_path, 'utf8')).new_imgs_threshold
+exports.newImgsThreshHold = () => yaml.safeLoad(fs.readFileSync(config_path, 'utf8')).new_imgs_threshold
 
 exports.addImgFiles = async (path, num) => {
     const srcImgPath = 'test/resources/square.jpg'
-    const errChk = (err) => {
-        if(err)
-            console.error(`Can't copy image file from ${srcImgPath}: ${err}`)
-    }
     for(let i = 0; i < num; i++) {
         const imgPath = `${path}${sep}file${Math.floor(Math.random() * 1000)}.jpg`
 //        fs.writeFileSync(imgPath, "", {flag: 'w'})
-        await fs.copyFile(srcImgPath, imgPath, errChk)
+        await fs.copyFileSync(srcImgPath, imgPath)
     }
 }
 
@@ -47,5 +43,6 @@ exports.setMotionPath = (emulatorPath) => {
     conf.paths.motion = path.resolve(emulatorPath)
     fs.writeFileSync(configPath, yaml.safeDump(conf), 'utf8')
 }
+
 
 exports.waitUntil = waitUntil

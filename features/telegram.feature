@@ -13,12 +13,13 @@ Feature: Using telegram bot for controlling detection process
     When User starts program with io TELEGRAM
     And User starts motion detecting by telegram
     Then User gets TXT notification of starting
+    And motion is running
 
   Scenario: Stopping detections
     When User starts program with io TELEGRAM
     And User stops motion detecting by telegram
     Then User gets TXT notification of stopping
-    And Program DOESN'T detect motion
+    And motions is stopped
 
   Scenario Outline: Getting images/video of detections
     When User starts program with io TELEGRAM

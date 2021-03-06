@@ -1,4 +1,4 @@
-const {Given, Then} = require('cucumber')
+const {Given, Then, When} = require('@cucumber/cucumber')
 
 const chai = require('chai')
     , chaiHttp = require('chai-http')
@@ -16,7 +16,6 @@ const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 const {sleep} = require('sleep')
 
 const path = require('path')
-var {When} = require('cucumber');
 
 require('dotenv').config()
 
