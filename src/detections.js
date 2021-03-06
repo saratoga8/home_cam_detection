@@ -44,7 +44,8 @@ const newImgsThreshold = () => {
  * @returns {string[]} Paths
  */
 function paths(fileExtension) {
-    return fs.readdirSync(dirPath).filter(file => extname(file).slice(1) === fileExtension)
+    return fs.readdirSync(dirPath)
+        .filter(file => extname(file).slice(1) === fileExtension)
         .map(file => dirPath.concat(sep, file))
 }
 
