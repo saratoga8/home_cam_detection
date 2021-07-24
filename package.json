@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha --exit",
     "start": "node src/main.js --pid_path=bin/.pid",
-    "stop": "cd bin && ./stop.sh && cd .."
+    "stop": "cd bin && ./stop.sh && cd ..",
+    "cucumber": "cucumber-js features/*.feature"
   },
   "repository": {
     "type": "git",
