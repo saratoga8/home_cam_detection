@@ -13,16 +13,26 @@ const ioConf = { path: 'resources/io.yml', copyPath:  '/tmp/io.yml'}
 
 
 Before(async function () {
-    fs.copyFileSync(detectionsConf.path, detectionsConf.copyPath)
-    fs.copyFileSync(ioConf.path, ioConf.copyPath)
+    try {
+        fs.copyFileSync(detectionsConf.path, detectionsConf.copyPath)
+        fs.copyFileSync(ioConf.path, ioConf.copyPath)
+    }
+    catch (e) {
+        console.error(`Stopped because of error: ${e.stack}`)
+    }
 })
 
 After(async function () {
-    fs.copyFileSync(detectionsConf.copyPath, detectionsConf.path)
-    fs.copyFileSync(ioConf.copyPath, ioConf.path)
-    if(this.childProc != null) {
-        this.childProc.kill('SIGTERM')
+    try {
+        fs.copyFileSync(detectionsConf.copyPath, detectionsConf.path)
+        fs.copyFileSync(ioConf.copyPath, ioConf.path)
+        if (this.childProc != null) {
+            this.childProc.kill('SIGTERM')
+        }
+        if (this.program !== undefined)
+            fs.closeSync(this.program.outputFD)
     }
-    if(this.program !== undefined)
-        fs.closeSync(this.program.outputFD)
+    catch (e) {
+        console.error(`Stopped because of error: ${e.stack}`)
+    }
 })

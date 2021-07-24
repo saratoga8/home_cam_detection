@@ -2,7 +2,7 @@
 
 const commands = require('../commands')
 const yaml = require('js-yaml')
-const fs = require('fs')
+const { readFileSync, statSync, writeFileSync } = require('fs')
 const api = require('node-telegram-bot-api')
 
 require('dotenv').config()
@@ -19,7 +19,7 @@ const videoMaxSize = 52428800
  * @returns {string|*} String of the message type
  */
 const mediaMsgType = () => {
-    const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
+    const conf = yaml.safeLoad(readFileSync(confPath, 'utf8'))
     return (conf === undefined || conf.telegram === undefined) ? 'image' : conf.telegram.msg_type
 }
 
@@ -52,11 +52,11 @@ function sendMsg(txt) {
  */
 function setChatID(id) {
     if(id !== chatID) {
-        const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
+        const conf = yaml.safeLoad(readFileSync(confPath, 'utf8'))
         const telegram = conf.telegram
         if(telegram.chatID !== id) {
             conf.telegram.chatID = id
-            fs.writeFileSync(confPath, yaml.safeDump(conf, 'utf8'), (err => console.error(`Can't write to file ${confPath}: ${err}`)))
+            writeFileSync(confPath, yaml.safeDump(conf, 'utf8'), (err => console.error(`Can't write to file ${confPath}: ${err}`)))
         }
         chatID = id
     }
@@ -151,7 +151,11 @@ function sendPics(data) {
 }
 
 function sendTxt(data) {  ///////// TODO Should be replaced by using sendMsg(txt)
-    bot.sendMessage(chatID, data.text).catch((err) => console.error(`Can't send to telegram chat text message: ${err}`))
+    console.debug("Sending text message")
+    if (bot)
+        bot.sendMessage(chatID, data.text).catch((err) => console.error(`Can't send to telegram chat text message: ${err}`))
+    else
+        console.error("Bot instance hasn't initialized")
 }
 
 /**
@@ -161,7 +165,7 @@ function sendTxt(data) {  ///////// TODO Should be replaced by using sendMsg(txt
  */
 function sendVideo(data, minFileSizeByte) {
     if(data.name === mediaMsgType()) {
-        const size = fs.statSync(data.path).size
+        const size = statSync(data.path).size
         if(size > minFileSizeByte) {
             if(size < videoMaxSize) {
                 bot.sendVideoNote(chatID, data.path)
@@ -177,6 +181,7 @@ function sendVideo(data, minFileSizeByte) {
  * Initialization of Telegram bot
  */
 function initBot() {
+    console.debug("Initialization of Telegram Bot")
     if(bot == null) {
         const token = process.env.TELEGRAM_BOT_TOKEN
         if(token !== undefined)
@@ -191,7 +196,7 @@ function initBot() {
  * @param {Object} data Object containing name of the sent data and paths of images {@link sent_data}
  */
 function sendDetections(data) {
-    if (bot == null) initBot()
+    if (bot == null) initBot()              ///// TODO The case of still bot === null should be fixed
     if (chatID == null)
         chatID = process.env.TELEGRAM_BOT_CHAT
 

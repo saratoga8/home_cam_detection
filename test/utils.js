@@ -1,22 +1,20 @@
-const sleep = require('sleep')
-const {execSync} = require('child_process')
+const { join, resolve, sep } = require('path')
 const yaml = require('js-yaml')
 const fs = require('fs')
-const {sep} = require('path')
+const { tmpdir } = require('os')
+const { copySync, removeSync } = require('fs-extra')
 
-function waitUntil(timeoutSec, sleepMs = 100, callback) {
-    return new Promise((resolve, reject) => {
-        const maxNum = timeoutSec * 1000 / sleepMs
-        let result = false
-        for (let i = 0; i < maxNum; ++i) {
-            sleep.msleep(sleepMs)
-            if (callback()) {
-                result = true
-                break
-            }
-        }
-        result ? resolve(result) : reject(result)
-    })
+const waitUntil = async (expectedCondition, timeoutSec, stepMSec = 100) => {
+    const times = timeoutSec * 1000 / stepMSec
+    let result = false
+    for (let i = 0; i < times; ++i) {
+        setTimeout(async () => {
+            result = await expectedCondition()
+        }, stepMSec)
+        if(result)
+            break
+    }
+    return result
 }
 
 const config_path = 'resources/detections.yml'
@@ -30,19 +28,35 @@ exports.addImgFiles = async (path, num) => {
     const srcImgPath = 'test/resources/square.jpg'
     for(let i = 0; i < num; i++) {
         const imgPath = `${path}${sep}file${Math.floor(Math.random() * 1000)}.jpg`
-//        fs.writeFileSync(imgPath, "", {flag: 'w'})
         await fs.copyFileSync(srcImgPath, imgPath)
     }
 }
 
-const path = require('path')
+exports.addVideo = async (destPath) => {
+    const resourcesPath = resolve('test/resources/')
+    let fileName = 'video.mp4'
+    const videoPath = resourcesPath + sep + fileName
+    await fs.copyFileSync(videoPath, destPath + sep + fileName)
+    fileName = 'video.finished'
+    await fs.copyFileSync(resourcesPath + sep + fileName, `/tmp/${fileName}`)
+}
 
 exports.setMotionPath = (emulatorPath) => {
     const configPath = 'resources/detections.yml'
     const conf = yaml.safeLoad(fs.readFileSync(configPath, 'utf8'))
-    conf.paths.motion = path.resolve(emulatorPath)
+    conf.paths.motion = resolve(emulatorPath)
     fs.writeFileSync(configPath, yaml.safeDump(conf), 'utf8')
 }
 
+exports.sleepMs = async (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-exports.waitUntil = waitUntil
+exports.storeResources = () => {
+    const dirPath = fs.mkdtempSync(join(tmpdir(), "resources"), "utf8")
+    copySync(resolve('resources'), dirPath)
+    return dirPath
+}
+
+exports.restoreResources = (fromPath) => {
+    copySync(fromPath, resolve('resources'))
+    removeSync(fromPath)
+}

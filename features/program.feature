@@ -1,9 +1,10 @@
 @program
 Feature: Base actions on program
 
+  @current
   Scenario Outline: Starting program
     When User starts program with io <type>
-    Then The program has started
+    Then The motion has started
 
     Examples:
       | type     |

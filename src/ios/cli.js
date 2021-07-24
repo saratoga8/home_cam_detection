@@ -11,6 +11,9 @@ exports.io = {
             else if(data.name === sent_data.types.TXT.name) {
                 console.log(data.txt)
             }
+            // else if(data.name === sent_data.types.VIDEO.name) {
+            //     console.log("bla")
+            // }
         }
     },
     in: {

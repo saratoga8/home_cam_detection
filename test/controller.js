@@ -23,7 +23,10 @@ let emitter = null
 
 describe('Controller', () => {
     before(function ()  { setMotionPath('test/resources/motion.sh') })
-    after(function ()  { setMotionPath(motionPath) })
+    after(async function ()  {
+        setMotionPath(motionPath)
+        await fs.close
+    })
     afterEach(function ()  {
         chai.spy.restore(console)
         chai.spy.restore(io.ios.CLI.out)

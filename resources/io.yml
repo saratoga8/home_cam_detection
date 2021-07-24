@@ -1,7 +1,6 @@
-telegram:
-  use: 'no'
-  msg_type: image
-  chatID: 1320889499
-
 cli:
-  use: 'yes'
+  use: no
+telegram:
+  use: yes
+  msg_type: video
+  token: bla-bla

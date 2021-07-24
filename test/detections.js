@@ -3,6 +3,7 @@ const {execSync} = require('child_process')
 
 const chai = require('chai')
 const assert = chai.assert
+const expect = chai.expect
 const should = chai.should()
 chai.use(require("chai-events"));
 const EventEmitter = require("events");
@@ -33,6 +34,16 @@ describe('Detections use', async () => {
         let p = emitter.should.emit(detections.eventStr);
         const imgsNum = newImgsThreshHold() + 2
         await addImgFiles(detectionsDirPath, imgsNum)
+        return p
+    })
+
+    it('start detecting when added video', async () => {
+        detections.start(emitter)
+        let p = emitter.should.emit(detections.eventStr);
+        const videoPath = 'test/resources/video.mp4'
+        expect(videoPath, "The file with video doesn't exist").to.be.exist
+        await fs.copyFileSync(videoPath, `${detectionsDirPath}/video.mp4`)
+        await fs.copyFileSync('test/resources/video.finished', `/tmp/video.finished`)
         return p
     })
 

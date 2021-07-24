@@ -1,38 +1,61 @@
-const {Then, When} = require('@cucumber/cucumber');
+const {Given, Then, When} = require('@cucumber/cucumber');
 const chai = require('chai')
 const assert = chai.assert
-const should = chai.should
 const expect = chai.expect
 chai.use(require('chai-fs'))
 const fs = require('fs')
-const {sleep} = require('sleep')
 
 const {addImgFiles, detectionsDirPath, newImgsThreshHold} = require('../../test/utils')
 
 const yaml = require('js-yaml')
 const config_path = 'resources/detections.yml'
 
-const {execSync} = require('child_process')
+const { resolve } = require('path')
+
+const { waitUntil } = require('async-wait-until')
 
 When(/^There are detections with number (more|less) than threshold$/, async function (action) {
-    assert.pathExists(detectionsDirPath, "There is no directory of detections")
+    expect(detectionsDirPath).to.be.a.directory()
+    const imgsNumBefore = fs.readdirSync(detectionsDirPath).length
     const imgsNum = Math.round((action === 'more') ? newImgsThreshHold() + 2 : newImgsThreshHold() / 2)
     await addImgFiles(detectionsDirPath, imgsNum)
-    sleep(1)
+
+    const expectedCondition = () => fs.readdirSync(detectionsDirPath).length === imgsNumBefore + imgsNum
+    try {
+        await waitUntil(expectedCondition, { timeout: 3000})
+    } catch (e) {
+        assert.fail(`Copying detections to ${detectionsDirPath} has failed`)
+    }
 })
 
-Then(/^Program (DOES|DOESN'T) detect motion$/, function (action) {
+Then(/^Program (DOES|DOESN'T) detect motion$/, async function (action) {
+    fs.truncateSync(this.program.outputPath)
     const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
     const imgExt = conf.extensions.img
 
+    const outputPath = this.program.outputPath
+
+    const msgPart = action === 'DOES' ? 'are no' : 'are still'
+    const errMsg = `There ${msgPart} detections paths in program's output file ${outputPath}`
+
+    const getTxtFromOutput = () => fs.readFileSync(outputPath, 'utf8')
+
     const pattern = RegExp(`${detectionsDirPath}/(\\w+).${imgExt}`, 'g')
-    const txt = fs.readFileSync(this.program.outputPath, 'utf8')
-    const errMsg = action === 'DOES' ? `There is no found detections paths in program's output: ${txt}` : `There is still found detections paths in program's output: ${txt}`
-    if (action === 'DOES') {
-        assert.isNotNull(txt.match(pattern), `There is no detections in the program's output: ${txt}`)
-        assert.isTrue(txt.match(pattern).length >= newImgsThreshHold(), errMsg)
+    const expectedCondition = (action === 'DOES')
+        ? () => getTxtFromOutput().match(pattern) && getTxtFromOutput().match(pattern).length >= newImgsThreshHold()
+        : () => getTxtFromOutput().match(pattern) === null
+
+    try {
+        await waitUntil(expectedCondition, { timeout: 3000})
+    } catch (e) {
+        assert.fail(errMsg)
     }
-    else
-        assert.isNull(txt.match(pattern), errMsg)
-    fs.truncateSync(this.program.outputPath)
 })
+
+
+Given(/^There is video detection$/, async function () {
+    const videoPath = resolve('test/resources/video.mp4')
+    expect(videoPath, "The file with video doesn't exist").to.be.exist
+    await fs.copyFileSync(videoPath, `${detectionsDirPath}/video.mp4`)
+    await fs.copyFileSync('test/resources/video.finished', `/tmp/video.finished`)
+});
