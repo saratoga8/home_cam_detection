@@ -5,7 +5,7 @@ const chai = require('chai')
 const assert = chai.assert
 const { detectionsDirPath } = require('../../test/utils')
 chai.use(require('chai-as-promised'))
-const telegram = require('../support/telegram-td')
+//const telegram = require('../support/telegram-td')
 
 const config_path = 'resources/detections.yml'
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
@@ -48,8 +48,8 @@ When(/^User (stop|start)s motion detecting by (program|telegram)$/, async functi
         await waitForTxtInFile(strings[action], this.program.outputPath)
         await waitForTxtInFile("OK", this.program.outputPath)
     }
-    if(type === 'telegram')
-        await telegram.send(action)
+    // if(type === 'telegram')
+    //     await telegram.send(action)
 })
 
 

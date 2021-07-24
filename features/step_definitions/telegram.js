@@ -7,7 +7,7 @@ const assert = chai.assert
 const expect = chai.expect
 chai.use(require('chai-as-promised'))
 
-const telegram = require('../support/telegram-td')
+const telegram = require('../../test/separated/telegram-td')
 
 
 const yaml = require('js-yaml')

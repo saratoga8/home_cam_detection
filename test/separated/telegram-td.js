@@ -1,10 +1,10 @@
 const { Client } = require('tdl')
 const { TDLib } = require('tdl-tdlib-addon')
 
-const { sleepMs } = require('../../test/utils')
+const { sleepMs } = require('../utils')
 
 const path = '/home/saratoga/Downloads/tdlib/td/build/libtdjson.so'
-const CHAT_ID = 1453920552
+const CHAT_ID = process.env.TELEGRAM_BOT_CHAT
 const imgMsgType = 'messagePhoto'
 const txtMsgType = 'formattedText'
 const videoMsgType = 'messageAnimation'
@@ -13,8 +13,8 @@ let lastMsgs = []
 
 const getClient = () => {
     const client = new Client(new TDLib(path), {
-        apiId: 2100297,
-        apiHash: '603c531b9644380aeb3fa5d41aca47bc'
+        apiId: process.env.TELEGRAM_API_ID,
+        apiHash: process.env.TELEGRAM_API_HASH
     })
     client.on('error', console.error)
     client.on('update', update => {
