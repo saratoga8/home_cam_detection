@@ -1,3 +1,5 @@
+# TDLib
+_td*
 # Logs
 logs
 *.log
@@ -107,3 +109,6 @@ dist
 /motion/
 /home_cam.tar.bz2
 /.github/
+
+*.del
+/test/resources/home_cam_tlgrm_creds.png

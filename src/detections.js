@@ -2,7 +2,9 @@
 
 const yaml = require('js-yaml')
 const fs = require('fs')
-const { sep, extname, join, resolve } = require('path')
+const { sep, extname, resolve } = require('path')
+
+const chokidar = require('chokidar')
 
 const config_path = 'resources/detections.yml'
 const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
@@ -44,8 +46,46 @@ const newImgsThreshold = () => {
  * @returns {string[]} Paths
  */
 function paths(fileExtension) {
-    return fs.readdirSync(dirPath).filter(file => extname(file).slice(1) === fileExtension)
+    return fs.readdirSync(dirPath)
+        .filter(file => extname(file).slice(1) === fileExtension)
         .map(file => dirPath.concat(sep, file))
+}
+
+function emitEventWithLastImgsPaths(emitter) {
+    const data = Object.create(sentData.types.IMAGES)
+    data.paths = sortPaths(paths(imgExt)).slice(0, count)
+    emitter.emit(eventStr, data)
+}
+
+function processImg(emitter, filePath) {
+    if (filePath.endsWith(`.${imgExt}`)) {
+        if ((toNowSeconds() - lastDetectionDate) > minTimeBetweenDetectionsSeconds) {
+            count = 0
+            lastDetectionDate = toNowSeconds()
+            return
+        }
+        const threshold = newImgsThreshold()
+        if ((threshold !== undefined) && (count >= threshold)) {
+            if(count === threshold) {
+                emitEventWithLastImgsPaths(emitter)
+                count++
+            }
+            else {
+                count = 0
+                cleanDir()
+            }
+        } else count++
+    }
+}
+
+function processVideo(emitter, filePath) {
+    if (filePath.endsWith('video.finished')) {
+        const path = sortPaths(paths(videoExt))[0]
+        const data = Object.create(sentData.types.VIDEO)
+        data.path = path
+        emitter.emit(eventStr, data)
+        cleanDir()
+    }
 }
 
 /**
@@ -53,38 +93,18 @@ function paths(fileExtension) {
  * The func counts the new files and after a threshold emits event.
  * Counting depends on period between current and the last detection if the period is too long, then counting is zeroed.
  * @param {EventEmitter} emitter Emitter instance for emitting events
- * @fires Detection event
  */
 function start(emitter) {
-    !fs.existsSync(dirPath) && fs.mkdirSync(dirPath, {recursive: true})
-    fs.watch(dirPath, {persistent: false}, (event, file) => {
-        if (fs.existsSync(join(dirPath, file))) {
-            if (file.endsWith(`.${imgExt}`)) {
-                if ((toNowSeconds() - lastDetectionDate) > minTimeBetweenDetectionsSeconds) {
-                    count = 0
-                    lastDetectionDate = toNowSeconds()
-                }
-                const threshold = newImgsThreshold()
-                if ((threshold !== undefined) && (count > threshold)) {
-                    const data = Object.create(sentData.types.IMAGES)
-                    data.paths = sortPaths(paths(imgExt)).slice(0, count)
-                    emitter.emit(eventStr, data)
-                    count = 0
-                    cleanDir()
-                } else count++
-            }
-        }
-    })
-    fs.watch('/tmp', {persistent: false}, (event, fileName) => {
-        if (event === 'rename' && fileName === 'video.finished') {
-            const path = sortPaths(paths(videoExt))[0]
-            const data = Object.create(sentData.types.VIDEO)
-            data.path = path
-            emitter.emit(eventStr, data)
-            cleanDir()
-        }
-    })
+    if(!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, {recursive: true})
+    }
+
+    const imgsListener = (path) => processImg(emitter, path)
+    chokidar.watch(dirPath).on('add', imgsListener)
+    const videoListener = (path) => processVideo(emitter, path)
+    chokidar.watch('/tmp').on('add', videoListener)
 }
+
 
 
 /**

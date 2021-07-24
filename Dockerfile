@@ -8,10 +8,10 @@ COPY resources resources
 COPY src src
 COPY test test
 COPY package.json package.json
+COPY bin bin
 
 RUN touch /tmp/stam && rm /tmp/stam
 
-RUN apt-get update && apt-get install -y motion procps
-RUN npm install && npm test
+RUN mkdir -p motion/detections
 
 ENTRYPOINT ["/bin/bash"]

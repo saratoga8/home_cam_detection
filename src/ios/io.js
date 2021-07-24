@@ -6,6 +6,7 @@ const fs   = require('fs');
 
 const ios = { CLI: { out: cli.io.out, in: cli.io.in}, TELEGRAM: { out: tgm.io.out, in: tgm.io.in } }
 
+
 /**
  * Get IO object name should be used from YAML file
  * @access private
@@ -46,4 +47,4 @@ exports.loadFrom = (path) => {
 }
 
 exports.ios = ios
-
+exports.eventMsgSent = "sent"

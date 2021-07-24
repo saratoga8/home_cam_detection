@@ -1,9 +1,11 @@
+@motion
 Feature: Motion detecting by program
 
   Background:
     Given There are no detections in directory
-    When User starts program with io CLI
     And User sets time between detections 2s
+    When User starts program with io CLI
+    And The motion has started
 
   Scenario Outline: User starts motions detecting
     And There are detections with number <sign> than threshold
@@ -14,6 +16,7 @@ Feature: Motion detecting by program
       | DOES    | more |
       | DOESN'T | less |
 
+    @current
   Scenario: User stops motion detecting
     And There are detections with number more than threshold
     And Program DOES detect motion
