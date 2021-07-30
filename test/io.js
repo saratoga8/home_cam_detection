@@ -14,6 +14,11 @@ const commands = require('../src/commands')
 const io = require('../src/ios/io')
 const { storeResources, restoreResources } = require('./utils')
 
+const setBotTokenEnvVar = (val) => {
+    copyFileSync('test/resources/ios/telegram.yml', 'resources/io.yml')
+    if (process.env.TELEGRAM_BOT_TOKEN)
+        process.env.TELEGRAM_BOT_TOKEN = val
+}
 
 describe('IO', () => {
     let storedResourcesPath
@@ -62,9 +67,7 @@ describe('IO', () => {
 
     context('Telegram', () => {
         it("There is no Bot token in config file or env. variable", () => {
-            copyFileSync('test/resources/ios/telegram.yml', 'resources/io.yml')
-            if (process.env.TELEGRAM_BOT_TOKEN)
-                process.env.TELEGRAM_BOT_TOKEN = ''
+            setBotTokenEnvVar('')
             const emitter = new EventEmitter()
             controller.run(emitter, io.ios.TELEGRAM)
             emitter.emit("command", {name: commands.stopMotion.command_name})
@@ -74,9 +77,7 @@ describe('IO', () => {
         })
 
         it("There is no Bot token in config file but it is in env. variable", () => {
-            copyFileSync('test/resources/ios/telegram.yml', 'resources/io.yml')
-            if (process.env.TELEGRAM_BOT_TOKEN)
-                process.env.TELEGRAM_BOT_TOKEN = 'bla-bla'
+            setBotTokenEnvVar('bla-bla')
             const emitter = new EventEmitter()
             controller.run(emitter, io.ios.TELEGRAM)
             emitter.emit("command", {name: commands.stopMotion.command_name})
