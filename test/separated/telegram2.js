@@ -14,10 +14,7 @@ const {storeResources, restoreResources, detectionsDirPath} = require('../utils'
 
 
 
-const yaml = require('js-yaml')
 const {sleepMs} = require("../utils");
-const config_path = 'resources/io.yml'
-const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
 
 
 const clrDir = async (dirPath) => {
@@ -74,7 +71,7 @@ describe('Telegram commands', function () {
     it('User sends an invalid command', async () => {
         const msgTxt = 'bla-bla'
         await send(msgTxt)
-          let msgs = await waitForLastMsgs(2, txtMsgType)
+        let msgs = await waitForLastMsgs(2, txtMsgType)
         assert.equal(msgs.shift(), `Unknown command ${msgTxt}`, "The answer is invalid")
         assert.equal(msgs.shift(), msgTxt, "The sent command is invalid")
 
@@ -88,4 +85,5 @@ describe('Telegram commands', function () {
 //        assert.equal(msgs.shift(), msgTxt, "The answer is invalid")
         assert.equal(msgs.shift(), msgTxt, "The sent command is invalid")
     })
+
 })

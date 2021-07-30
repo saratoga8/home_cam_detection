@@ -26,12 +26,12 @@ const mediaMsgType = () => {
 /**
  * Load  API Token of Telegram bot
  * @returns {String|undefined} Token string or 'undefined'
- *
-function loadToken() {
-    const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
+ */
+function initToken() {
+    const conf = yaml.safeLoad(readFileSync(confPath, 'utf8'))
     const telegram = conf.telegram
-    return (telegram !== undefined) ? telegram.token : undefined
-}*/
+    return (telegram && telegram.token) ? telegram.token : process.env.TELEGRAM_BOT_TOKEN
+}
 
 let chatID = null
 let bot = null
@@ -183,8 +183,8 @@ function sendVideo(data, minFileSizeByte) {
 function initBot() {
     console.debug("Initialization of Telegram Bot")
     if(bot == null) {
-        const token = process.env.TELEGRAM_BOT_TOKEN
-        if(token !== undefined)
+        const token = initToken()
+        if(token && token !== '')
             bot = new api(token, {polling: true})
         else
             console.error("There is no Telegram bot API token found")

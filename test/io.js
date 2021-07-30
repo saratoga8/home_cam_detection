@@ -4,18 +4,21 @@ chai.use(chaiHttp)
 const spies = require('chai-spies')
 const expect = chai.expect
 const assert = chai.assert
-const chaiExecAsync = require('chai-exec')
-const {execSync} = require('child_process')
+
+const { copyFileSync } = require('fs')
 
 chai.use(spies)
 const controller = require('../src/controller')
 const EventEmitter = require("events")
 const commands = require('../src/commands')
 const io = require('../src/ios/io')
+const { storeResources, restoreResources } = require('./utils')
 
 
 describe('IO', () => {
+    let storedResourcesPath
     beforeEach(function () {
+        storedResourcesPath = storeResources()
         chai.spy.on(io.ios.CLI.out, ['send'])
         chai.spy.on(io.ios.TELEGRAM.out, ['send'])
         chai.spy.on(console, ['error'])
@@ -25,6 +28,7 @@ describe('IO', () => {
         chai.spy.restore(io.ios.TELEGRAM.out)
         chai.spy.restore(io.ios.CLI.out)
         chai.spy.restore(console)
+        restoreResources(storedResourcesPath)
     })
 
     context('CLI', () => {
@@ -57,7 +61,30 @@ describe('IO', () => {
     })
 
     context('Telegram', () => {
-        it('Output', () => {
+        it("There is no Bot token in config file or env. variable", () => {
+            copyFileSync('test/resources/ios/telegram.yml', 'resources/io.yml')
+            if (process.env.TELEGRAM_BOT_TOKEN)
+                process.env.TELEGRAM_BOT_TOKEN = ''
+            const emitter = new EventEmitter()
+            controller.run(emitter, io.ios.TELEGRAM)
+            emitter.emit("command", {name: commands.stopMotion.command_name})
+
+            expect(console.error).to.have.been.called(2)
+            expect(console.error).to.have.been.called.with("There is no Telegram bot API token found")
+        })
+
+        it("There is no Bot token in config file but it is in env. variable", () => {
+            copyFileSync('test/resources/ios/telegram.yml', 'resources/io.yml')
+            if (process.env.TELEGRAM_BOT_TOKEN)
+                process.env.TELEGRAM_BOT_TOKEN = 'bla-bla'
+            const emitter = new EventEmitter()
+            controller.run(emitter, io.ios.TELEGRAM)
+            emitter.emit("command", {name: commands.stopMotion.command_name})
+
+            expect(console.error).not.have.been.called
+        })
+
+        it('Output work', () => {
             const emitter = new EventEmitter()
             controller.run(emitter, io.ios.TELEGRAM)
             emitter.emit("command", {name: commands.stopMotion.command_name})

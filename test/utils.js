@@ -50,12 +50,20 @@ exports.setMotionPath = (emulatorPath) => {
 
 exports.sleepMs = async (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
+/**
+ * Store resources files
+ * @return {string} The path of the directory with the stored resources
+ */
 exports.storeResources = () => {
     const dirPath = fs.mkdtempSync(join(tmpdir(), "resources"), "utf8")
     copySync(resolve('resources'), dirPath)
     return dirPath
 }
 
+/**
+ * Restore resources from the given directory
+ * @param {string} fromPath
+ */
 exports.restoreResources = (fromPath) => {
     copySync(fromPath, resolve('resources'))
     removeSync(fromPath)
