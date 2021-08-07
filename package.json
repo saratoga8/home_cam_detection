@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "chokidar": "^3.5.1",
-    "dotenv": "^8.2.0",
+    "dotenv": "^8.6.0",
     "js-yaml": "^3.14.0",
     "jsdoc": "^3.6.6",
     "node-telegram-bot-api": "^0.53.0",
