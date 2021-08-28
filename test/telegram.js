@@ -151,7 +151,7 @@ const chkDetections = async (type) => {
     const expectedMsgsNum = (type === 'image') ? newImgsThreshHold() : 1
 
     try {
-        await waitUntil(someMsgReceived, { timeout: 6000 })
+        await waitUntil(someMsgReceived, { timeout: 8000 })
     } catch (e) {
         assert.fail('There is no any new messages')
     }
@@ -171,7 +171,7 @@ function setTelegramBotToken() {
 describe('Managing via Telegram', function () {
     let storedResourcesPath
 
-    this.timeout(5000)
+    this.timeout(10000)
 
     after(() => restoreResources(storedResourcesPath))
 
@@ -210,7 +210,7 @@ describe('Managing via Telegram', function () {
 describe('Detections via Telegram', function () {
     let storedResourcesPath
 
-    this.timeout(8000)
+    this.timeout(10000)
 
     after(() => restoreResources(storedResourcesPath))
 
