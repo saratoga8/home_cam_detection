@@ -7,7 +7,7 @@ const { sep, extname, resolve } = require('path')
 const chokidar = require('chokidar')
 
 const config_path = 'resources/detections.yml'
-const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
+const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
 const dirPath = resolve(__dirname, "../motion/detections")
 const imgExt = conf.extensions.img
 const videoExt = conf.extensions.video
@@ -35,7 +35,7 @@ let lastDetectionDate = toNowSeconds()
  * @returns {undefined|int} Threshold number or undefined
  */
 const newImgsThreshold = () => {
-    const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
+    const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
     return (conf === undefined) ? undefined : conf.new_imgs_threshold
 }
 

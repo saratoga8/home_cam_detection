@@ -19,7 +19,7 @@ const videoMaxSize = 52428800
  * @returns {string|*} String of the message type
  */
 const mediaMsgType = () => {
-    const conf = yaml.safeLoad(readFileSync(confPath, 'utf8'))
+    const conf = yaml.load(readFileSync(confPath, 'utf8'))
     return (conf === undefined || conf.telegram === undefined) ? 'image' : conf.telegram.msg_type
 }
 
@@ -28,7 +28,7 @@ const mediaMsgType = () => {
  * @returns {String|undefined} Token string or 'undefined'
  */
 function initToken() {
-    const conf = yaml.safeLoad(readFileSync(confPath, 'utf8'))
+    const conf = yaml.load(readFileSync(confPath, 'utf8'))
     const telegram = conf.telegram
     return (telegram && telegram.token) ? telegram.token : process.env.TELEGRAM_BOT_TOKEN
 }
@@ -52,14 +52,15 @@ function sendMsg(txt) {
  */
 function setChatID(id) {
     if(id !== chatID) {
-        const conf = yaml.safeLoad(readFileSync(confPath, 'utf8'))
+        const conf = yaml.load(readFileSync(confPath, 'utf8'))
         const telegram = conf.telegram
         if(telegram.chatID !== id) {
             conf.telegram.chatID = id
-            writeFileSync(confPath, yaml.safeDump(conf, 'utf8'), (err => console.error(`Can't write to file ${confPath}: ${err}`)))
+            writeFileSync(confPath, yaml.dump(conf, 'utf8'), (err => console.error(`Can't write to file ${confPath}: ${err}`)))
         }
         chatID = id
     }
+    console.debug(`Chat ID = ${chatID}`)
 }
 
 /**
@@ -67,7 +68,7 @@ function setChatID(id) {
  * @returns {String} ID
  *
 function loadChatID() {
-    const conf = yaml.safeLoad(fs.readFileSync(confPath, 'utf8'))
+    const conf = yaml.load(fs.readFileSync(confPath, 'utf8'))
     const telegram = conf.telegram
     return telegram.chatID
 }*/
@@ -114,12 +115,14 @@ function receiveBotMsg(emitter) {
     if(bot != null) {
         bot.on('message', (msg) => {
             setChatID(msg.chat.id)
-            const sentTxt = msg.text.toString()
-            const cmd = bot_cmds.find(cmd => cmd.name === sentTxt.toLowerCase())
-            if (cmd === undefined)
-                sendMsg(`Unknown command ${sentTxt}`)
-            else
-                cmd.exec(emitter)
+            if (msg.text) {
+                const sentTxt = msg.text.toString()
+                const cmd = bot_cmds.find(cmd => cmd.name === sentTxt.toLowerCase())
+                if (cmd === undefined)
+                    sendMsg(`Unknown command ${sentTxt}`)
+                else
+                    cmd.exec(emitter)
+            }
         })
     }
 }

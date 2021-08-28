@@ -24,9 +24,9 @@ const { waitUntil } = require('async-wait-until')
 
 function setMotionEmulator() {
     const configPath = 'resources/detections.yml'
-    const conf = yaml.safeLoad(fs.readFileSync(configPath, 'utf8'))
+    const conf = yaml.load(fs.readFileSync(configPath, 'utf8'))
     conf.paths.motion = path.resolve('test/resources/motion.sh')
-    fs.writeFileSync(configPath, yaml.safeDump(conf), 'utf8')
+    fs.writeFileSync(configPath, yaml.dump(conf), 'utf8')
 }
 
 When(/^User starts program with io (CLI|TELEGRAM)$/, function (io) {

@@ -14,18 +14,18 @@
     "url": "git+https://github.com/saratoga8/home_cam_detection.git"
   },
   "dependencies": {
-    "chokidar": "^3.5.1",
-    "dotenv": "^8.2.0",
-    "js-yaml": "^3.14.0",
+    "chokidar": "^3.5.2",
+    "dotenv": "^10.0.0",
+    "js-yaml": "^4.1.0",
     "jsdoc": "^3.6.6",
-    "node-telegram-bot-api": "^0.53.0",
+    "node-telegram-bot-api": "^0.54.0",
     "process": "^0.11.10",
-    "yargs": "^15.4.1"
+    "yargs": "^17.1.0"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^7.3.1",
     "async-wait-until": "^2.0.5",
-    "chai": "^4.3.3",
+    "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "chai-events": "^0.0.3",
     "chai-exec": "^2.1.1",
@@ -35,7 +35,7 @@
     "chai-spies": "^1.0.0",
     "eslint": "^7.21.0",
     "eslint-plugin-chai-friendly": "^0.6.0",
-    "mocha": "^9.0.1",
+    "mocha": "^9.0.3",
     "read-last-lines": "^1.8.0",
     "tdl": "^7.0.0",
     "tdl-tdlib-addon": "^1.0.1",

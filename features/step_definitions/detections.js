@@ -8,7 +8,7 @@ chai.use(require('chai-as-promised'))
 //const telegram = require('../support/telegram-td')
 
 const config_path = 'resources/detections.yml'
-const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
+const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
 
 const expect = chai.expect
 const chaiFiles = require('chai-files')
@@ -56,12 +56,12 @@ When(/^User (stop|start)s motion detecting by (program|telegram)$/, async functi
 When(/^User (increases|decreases) detection threshold$/, function (action) {
     if(action === 'increases')
         conf.new_imgs_threshold = conf.new_imgs_threshold + 2
-    fs.writeFileSync(config_path, yaml.safeDump(conf), 'utf8')
+    fs.writeFileSync(config_path, yaml.dump(conf), 'utf8')
 })
 
 When('User sets time between detections {int}s', function (seconds) {
     conf.seconds_between_detections = seconds
-    fs.writeFileSync(config_path, yaml.safeDump(conf), 'utf8')
+    fs.writeFileSync(config_path, yaml.dump(conf), 'utf8')
 })
 
 When(/^User deletes all files of detections$/, function () {
@@ -71,6 +71,6 @@ When(/^User deletes all files of detections$/, function () {
 })
 
 Then('The time between detections is {int}s', function (seconds) {
-    const actual = yaml.safeLoad(fs.readFileSync(config_path, 'utf8')).seconds_between_detections
+    const actual = yaml.load(fs.readFileSync(config_path, 'utf8')).seconds_between_detections
     assert.strictEqual(actual, seconds, `The file ${config_path} has invalid value of the time between detections`)
 });

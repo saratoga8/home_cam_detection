@@ -11,7 +11,7 @@ let childProcess = null
  * @returns {boolean} true If it has
  */
 function hasInstalled() {
-  const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
+  const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
   const proc = spawnSync(conf.paths.motion, ['-h'])
   return (!proc.error)
 }
@@ -26,7 +26,7 @@ function start () {
       stop()
     }
     if(childProcess == null) {
-      const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
+      const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
       childProcess = spawn(conf.paths.motion, ['-c', 'resources/motion.conf'])
       console.log("Starting motion")  // TODO Should be added checking of stopping
     }
