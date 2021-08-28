@@ -1,0 +1,7 @@
+{
+  "api_key": "",
+  "@type": "deleteChatHistory",
+  "chat_id": "",
+  "remove_from_chat_list": false,
+  "revoke": true
+}

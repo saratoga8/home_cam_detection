@@ -1,0 +1,14 @@
+{
+  "api_key": "",
+  "@type": "sendMessage",
+  "chat_id": "",
+  "disable_notification": true,
+  "input_message_content": {
+    "@type": "inputMessageText",
+    "disable_web_page_preview": false,
+    "text": {
+      "@type": "formattedText",
+      "text": ""
+    }
+  }
+}

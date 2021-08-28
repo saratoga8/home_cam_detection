@@ -1,0 +1,8 @@
+{
+  "api_key": "",
+  "@type": "getChatHistory",
+  "chat_id": "",
+  "limit": "100",
+  "offset": "0",
+  "from_message_id": "0"
+}
