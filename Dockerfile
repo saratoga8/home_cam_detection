@@ -1,4 +1,4 @@
-FROM node:16.6-slim
+FROM node:16.6.2-bullseye-slim
 
 WORKDIR /usr/src/home_cam
 VOLUME ["/usr/src/home_cam"]

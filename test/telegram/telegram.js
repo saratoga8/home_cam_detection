@@ -6,10 +6,10 @@ const assert = chai.assert
 const expect = chai.expect
 const { readFileSync } = require('fs')
 
-const controller = require('../src/controller')
+const controller = require('../../src/controller')
 const EventEmitter = require("events")
-const io = require('../src/ios/io')
-const { storeResources, restoreResources, detectionsDirPath, addVideo, newImgsThreshHold, addImgFiles } = require('./utils')
+const io = require('../../src/ios/io')
+const { storeResources, restoreResources, detectionsDirPath, addVideo, newImgsThreshHold, addImgFiles } = require('../utils')
 
 const {execSync} = require('child_process')
 const { waitUntil } = require('async-wait-until')
@@ -28,7 +28,7 @@ const yaml = require('js-yaml')
 const config_path = 'resources/io.yml'
 const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
 
-const detections = require('../src/detections')
+const detections = require('../../src/detections')
 
 const taasURL = "https://api.t-a-a-s.ru/"
 
