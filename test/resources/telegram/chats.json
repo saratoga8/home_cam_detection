@@ -1,0 +1,6 @@
+{
+  "api_key": "",
+  "@type": "getChats",
+  "limit": "100",
+  "offset_order": "9223372036854775807"
+}

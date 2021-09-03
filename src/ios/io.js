@@ -14,7 +14,7 @@ const ios = { CLI: { out: cli.io.out, in: cli.io.in}, TELEGRAM: { out: tgm.io.ou
  * @returns {string|null} Name of NULL
  */
 const getIoNameFrom = (path) => {
-    const doc = yaml.safeLoad(fs.readFileSync(path, 'utf8'))
+    const doc = yaml.load(fs.readFileSync(path, 'utf8'))
     if(doc !== undefined) {
         for(const prop in doc) {
             const io = doc[prop]

@@ -5,14 +5,13 @@ const motion = require('../src/motion')
 const chai = require('chai')
 const assert = chai.assert
 const expect = chai.expect
-const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
+const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
 const motionPath = conf.paths.motion
 chai.use(require("chai-events"));
 chai.use(require('chai-as-promised'))
 
 const chaiFiles = require('chai-files')
 chai.use(chaiFiles);
-const file = chaiFiles.file
 
 
 const spies = require('chai-spies')
@@ -30,10 +29,10 @@ describe('Motion use', () => {
 
     it("Motion hasn't installed", async () => {
         conf.paths.motion = "/bla/bla"
-        fs.writeFileSync(config_path, yaml.safeDump(conf), 'utf8')
+        fs.writeFileSync(config_path, yaml.dump(conf), 'utf8')
         const result = motion.hasInstalled()
         conf.paths.motion = motionPath
-        fs.writeFileSync(config_path, yaml.safeDump(conf), 'utf8')
+        fs.writeFileSync(config_path, yaml.dump(conf), 'utf8')
         assert.isFalse(result, "Motion HAS installed")
     })
 

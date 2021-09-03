@@ -30,7 +30,7 @@ When(/^There are detections with number (more|less) than threshold$/, async func
 
 Then(/^Program (DOES|DOESN'T) detect motion$/, async function (action) {
     fs.truncateSync(this.program.outputPath)
-    const conf = yaml.safeLoad(fs.readFileSync(config_path, 'utf8'))
+    const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
     const imgExt = conf.extensions.img
 
     const outputPath = this.program.outputPath

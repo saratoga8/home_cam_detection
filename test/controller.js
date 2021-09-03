@@ -13,7 +13,7 @@ const spies = require('chai-spies')
 const expect = chai.expect
 
 const fs = require('fs')
-const motionPath = require('js-yaml').safeLoad(fs.readFileSync('resources/detections.yml', 'utf8')).paths.motion
+const motionPath = require('js-yaml').load(fs.readFileSync('resources/detections.yml', 'utf8')).paths.motion
 
 
 chai.use(spies)
