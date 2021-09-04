@@ -13,6 +13,6 @@ module.exports = {
         "chai-friendly/no-unused-expressions": 2
     },
     "plugins": [
-    "chai-friendly"
+        "chai-friendly"
     ]
 };

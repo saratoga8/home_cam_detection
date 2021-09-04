@@ -4,8 +4,9 @@
   "description": "Detecting motion by camera and notifying user",
   "main": "src/main.js",
   "scripts": {
-    "test": "mocha test/*.js --exit",
+    "test:base": "mocha test/*.js --exit",
     "test:telegram": "mocha test/telegram/*.js --exit",
+    "test": "npm run test:base && npm run test:telegram",
     "start": "node src/main.js --pid_path=bin/.pid",
     "stop": "cd bin && ./stop.sh && cd ..",
     "cucumber": "cucumber-js features/*.feature"
