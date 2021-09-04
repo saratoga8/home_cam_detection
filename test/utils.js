@@ -3,7 +3,11 @@ const yaml = require('js-yaml')
 const fs = require('fs')
 const { tmpdir } = require('os')
 const { copySync, removeSync } = require('fs-extra')
+const { waitUntil } = require('async-wait-until')
+const {execSync} = require('child_process')
 
+const chai = require('chai')
+const assert = chai.assert
 // const waitUntil = async (expectedCondition, timeoutSec, stepMSec = 100) => {
 //     const times = timeoutSec * 1000 / stepMSec
 //     let result = false
@@ -68,3 +72,14 @@ exports.restoreResources = (fromPath) => {
     copySync(fromPath, resolve('resources'))
     removeSync(fromPath)
 }
+
+exports.clrDir = async (dirPath) => {
+    execSync(`rm -rf ${dirPath}/*.*`)
+    const isDirEmpty = () => fs.readdirSync(dirPath).length === 0
+    try {
+        await waitUntil(isDirEmpty, {timeout: 3000})
+    } catch (e) {
+        assert.fail(`Directory ${dirPath} hasn't cleared`)
+    }
+}
+
