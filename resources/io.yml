@@ -1,6 +1,6 @@
 cli:
-  use: 'no'
+  use: no
 telegram:
-  use: 'yes'
+  use: yes
   msg_type: video
-  token: 1453920552:AAFH08aBvY6hyF8UYVI4iunsoeAxZUQ3jy0
+  token: bla-bla
