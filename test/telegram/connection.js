@@ -18,15 +18,16 @@ require('dotenv').config()
 
 
 
-const imgMsgType = 'messagePhoto'
-const txtMsgType = 'messageText'
-const videoMsgType = 'messageVideoNote'
 
 const yaml = require('js-yaml')
 const config_path = 'resources/io.yml'
 const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
 
 const detections = require('../../src/detections')
+
+const imgMsgType = 'messagePhoto'
+const txtMsgType = 'messageText'
+const videoMsgType = 'messageVideoNote'
 
 const taasURL = "https://api.t-a-a-s.ru/"
 
@@ -200,4 +201,3 @@ exports.setTelegramBotToken = () => {
     conf.telegram.token = process.env.TELEGRAM_BOT_TOKEN
     fs.writeFileSync(config_path, yaml.dump(conf), 'utf8')
 }
-
