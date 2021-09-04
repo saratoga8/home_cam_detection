@@ -48,6 +48,11 @@ const addImagesDetections = async () => {
     await addImgFiles(detectionsDirPath, imgsNum)
 }
 
+/**
+ * Send API request via TAAS
+ * @param body {JSON} JSON of the request's body
+ * @return {Promise<JSON>} JSON body of a response
+ */
 const sendRequestViaTaas = async (body) => {
     body.api_key = process.env.TAAS_KEY
     const resp = await chai
