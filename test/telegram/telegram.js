@@ -11,7 +11,20 @@ const beforeEachCommon = async () => {
     await chkChatClearing(chatName)
 }
 
-describe('Managing via Telegram', function () {
+const testCommand = async (commandTxt, expectedAnswer, chatName, timeOut = 3000) => {
+    const txts = await sendAndReceiveTxtMsg(commandTxt, timeOut, chatName)
+    expect([ expectedAnswer, commandTxt ], "The sent command or response is invalid").eql(txts)
+}
+
+const beforeCommon = () => {
+    clrDir(detectionsDirPath)
+
+    const storedResourcesPath = storeResources()
+    setTelegramBotToken()
+    return storedResourcesPath
+}
+
+describe('Sending detections and managing via Telegram', function () {
     let storedResourcesPath
 
     this.timeout(10000)
@@ -19,52 +32,33 @@ describe('Managing via Telegram', function () {
     after(() => restoreResources(storedResourcesPath))
 
     before(async () => {
-        clrDir(detectionsDirPath)
-
-        storedResourcesPath = storeResources()
-        setTelegramBotToken()
-
+        storedResourcesPath = beforeCommon()
         runTelegram()
     })
 
     beforeEach(async () => await beforeEachCommon())
 
-    describe('Hello command', function () {
-        it('User sends hello', async () => {
-            const msgTxt = 'hello'
-            const txts = await sendAndReceiveTxtMsg(msgTxt, 3000, chatName)
-            expect([ msgTxt, msgTxt ], "The sent command or response is invalid").eql(txts)
-        })
+    context('Sending commands', () => {
+        const commandTests = [
+            { cmd: 'hello', expectedAnswer: 'hello' },
+            { cmd: 'bla-bla', expectedAnswer: `Unknown command bla-bla` }
+        ]
 
-        it('User sends an invalid command', async () => {
-            const msgTxt = 'bla-bla'
-            const txts = await sendAndReceiveTxtMsg(msgTxt, 3000, chatName)
-            expect([ `Unknown command ${msgTxt}`, msgTxt ], "The sent command or response is invalid").eql(txts)
+        commandTests.forEach(({cmd, expectedAnswer}) => {
+            const title = `User sends '${cmd}' command`
+            it(title, async () => await testCommand(cmd, expectedAnswer, chatName))
         })
     })
-})
 
-describe('Detections via Telegram', function () {
-    let storedResourcesPath
+    context('Sending detections', () => {
+        const detectionsTests = [
+            { type: 'video' },
+            { type: 'image' }
+        ]
 
-    this.timeout(10000)
-
-    after(() => restoreResources(storedResourcesPath))
-
-    before(async () => {
-        clrDir(detectionsDirPath)
-
-        storedResourcesPath = storeResources()
-        setTelegramBotToken();
-    })
-
-    beforeEach(async () => await beforeEachCommon())
-
-    it('Get video detection', async function() {
-       await chkDetections('video', chatName)
-    })
-
-    it('Get images of detection', async function() {
-        await chkDetections('image', chatName)
+        detectionsTests.forEach(({type}) => {
+            const title = `Get ${type} detections`
+            it(title, async () => await chkDetections(type, chatName))
+        })
     })
 })

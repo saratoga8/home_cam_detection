@@ -4,7 +4,6 @@ const chai = require('chai')
 chai.use(chaiHttp)
 const assert = chai.assert
 const expect = chai.expect
-const { readFileSync } = require('fs')
 
 const controller = require('../../src/controller')
 const EventEmitter = require("events")
@@ -71,10 +70,15 @@ const sendRequestViaTaas = async (body) => {
  * @return {Promise<Object[]>} array of messages
  */
 const messages = async (chatName) => {
-    const body = JSON.parse(readFileSync('test/resources/telegram/chat_history.json', 'utf-8'))
+    const body = getBodyFromResourcesFile('chat_history.json')
     body.chat_id = await getChatID(chatName)
 
     return (await sendRequestViaTaas(body)).messages
+}
+
+const getBodyFromResourcesFile = (fileName) => {
+    const bodyTxt = fs.readFileSync(`test/resources/telegram/${fileName}`, 'utf-8')
+    return JSON.parse(bodyTxt)
 }
 
 /**
@@ -84,19 +88,19 @@ const messages = async (chatName) => {
  * @return {Promise<void>}
  */
 const send = async (txt, chatName) => {
-    const body = JSON.parse(readFileSync('test/resources/telegram/send_txt.json', 'utf-8'))
+    const body = getBodyFromResourcesFile('send_txt.json')
     body.chat_id = await getChatID(chatName)
     body.input_message_content.text.text = txt
     await sendRequestViaTaas(body)
 }
 
 const getChatIDs = async () => {
-    const body = JSON.parse(readFileSync('test/resources/telegram/chats.json', 'utf-8'))
+    const body = getBodyFromResourcesFile('chats.json')
     return (await sendRequestViaTaas(body)).chat_ids
 }
 
 const getChatName = async (id) => {
-    const body = JSON.parse(readFileSync('test/resources/telegram/chat.json', 'utf-8'))
+    const body = getBodyFromResourcesFile('chat.json')
     body.chat_id = id
     return (await sendRequestViaTaas(body)).title
 }
@@ -125,12 +129,12 @@ const getChatID = async (name) => {
 }
 
 const clrChat = async (name) => {
-    const template = JSON.parse(readFileSync('test/resources/telegram/clr_chat.json', 'utf-8'))
+    let body = getBodyFromResourcesFile('clr_chat.json')
 
     const chatID = await getChatID(name)
     const addition = { api_key: process.env.TAAS_KEY, chat_id: chatID }
 
-    const body = Object.assign(template, addition)
+    body = Object.assign(body, addition)
 
     const resp = await chai
         .request(taasURL)
@@ -190,14 +194,14 @@ exports.chkDetections = async (type, chatName) => {
     else
         await addVideoDetection()
 
-    const expectedCond = () => async () =>  (await messages(chatName)).length !== 0
-    await waitUntilMsgsSent(expectedCond, 'There is no any new messages', 8000)
+    const expectedMsgsNum = (type === 'image') ? newImgsThreshHold() : 1
+    const expectedCond = () => async () =>  (await messages(chatName)).length === expectedMsgsNum
+    await waitUntilMsgsSent(expectedCond, 'There are no enough detection messages', 8000)
 
     const msgs = await messages(chatName)
     const mediaMsgs = (type === 'image') ? await getImgMsgs(msgs) : await getVideoMsgs(msgs)
     expect(mediaMsgs, `Cant get ${type} messages`).not.undefined
     expect(mediaMsgs, `No ${type} messages have found`).not.empty
-    const expectedMsgsNum = (type === 'image') ? newImgsThreshHold() : 1
     expect(mediaMsgs.length, `Invalid number of found ${type} messages`).equals(expectedMsgsNum)
 }
 
