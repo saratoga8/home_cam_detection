@@ -22,7 +22,8 @@
     "jsdoc": "^3.6.6",
     "node-telegram-bot-api": "^0.54.0",
     "process": "^0.11.10",
-    "yargs": "^17.1.0"
+    "yargs": "^17.1.0",
+    "log4js": "^6.3.0"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^7.3.1",
