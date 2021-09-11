@@ -12,14 +12,17 @@ const pid_path = args.pid_path
 const EventEmitter = require("events")
 
 const io = require('./ios/io').loadFrom('resources/io.yml')
+
+const { error, debug } = require('../src/logger/logger')
+
 if(io == null) {
-    console.error("Loading IO instance failed")
+    error("Loading IO instance failed")
     process.exit(1)
 }
 
 process.on('SIGTERM', () => {
     motion.stop()
-    console.log("Exiting")
+    debug("Exiting")
     process.exit()
 })
 
@@ -27,7 +30,7 @@ if(motion.hasInstalled()) {
     if(pid_path !== undefined) {
         fs.writeFile(pid_path, process.pid.toString(), err => {
             if (err) {
-                console.error(`Can't write PID to the file ${pid_path}: ${err.message}`)
+                error(`Can't write PID to the file ${pid_path}: ${err.message}`)
                 process.exit(9)
             }
         })
@@ -38,7 +41,7 @@ if(motion.hasInstalled()) {
         io.in.receive(emitter)
         setInterval(() => {}, 500)
     }
-    else console.error("ERROR: There is no parameter: path of file for saving PID")
+    else error("ERROR: There is no parameter: path of file for saving PID")
 }
 else
     process.exit(9)

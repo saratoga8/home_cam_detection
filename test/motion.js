@@ -19,11 +19,13 @@ chai.use(spies)
 
 const {setMotionPath} = require('./utils')
 
+const log = require('../src/logger/logger')
+
 describe('Motion use', () => {
     after(() => { setMotionPath(motionPath) })
-    afterEach(function () { chai.spy.restore(console) })
+    afterEach(function () { chai.spy.restore(log) })
     beforeEach(function ()  {
-        chai.spy.on(console, ['error', 'log', 'warn'])
+        chai.spy.on(log, ['error', 'debug', 'warn'])
         setMotionPath('test/resources/motion.sh')
     })
 
@@ -38,10 +40,10 @@ describe('Motion use', () => {
 
     it("Motion starting and stopping", () => {
         motion.start()
-        expect(console.log).to.have.been.called.once.with("Starting motion")
+        expect(log.debug).to.have.been.called.once.with("Starting motion")
         motion.stop()
-        expect(console.log).to.have.been.called(2).with("Stopping motion")
-        expect(console.error).to.have.not.been.called
+        expect(log.debug).to.have.been.called(2).with("Stopping motion")
+        expect(log.error).to.have.not.been.called
     })
 
     it("Motion re-start", () => {

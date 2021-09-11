@@ -5,6 +5,7 @@ const { spawn, spawnSync } = require('child_process')
 const config_path = 'resources/detections.yml'
 let childProcess = null
 
+const { error, debug, warn } = require('../src/logger/logger')
 
 /**
  * Has motion installed
@@ -22,16 +23,16 @@ function hasInstalled() {
 function start () {
   try {
     if (childProcess != null) {
-      console.warn("Killing previous instance of motion")
+      warn("Killing previous instance of motion")
       stop()
     }
     if(childProcess == null) {
       const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
       childProcess = spawn(conf.paths.motion, ['-c', 'resources/motion.conf'])
-      console.log("Starting motion")  // TODO Should be added checking of stopping
+      debug("Starting motion")  // TODO Should be added checking of stopping
     }
   } catch (e) {
-    console.error(e)
+    error(e)
   }
 }
 
@@ -42,7 +43,7 @@ function stop() {
   if(childProcess) {
     childProcess.kill("SIGTERM")
     childProcess = null
-    console.log("Stopping motion") // TODO Should be added checking of stopping
+    debug("Stopping motion") // TODO Should be added checking of stopping
   }
 }
 
