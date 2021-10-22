@@ -16,8 +16,7 @@ const { storeResources, restoreResources } = require('./utils')
 
 const setBotTokenEnvVar = (val) => {
     copyFileSync('test/resources/ios/telegram.yml', 'resources/io.yml')
-    if (process.env.TELEGRAM_BOT_TOKEN)
-        process.env.TELEGRAM_BOT_TOKEN = val
+    process.env.TELEGRAM_BOT_TOKEN = val
 }
 
 describe('IO', () => {
@@ -26,13 +25,11 @@ describe('IO', () => {
         storedResourcesPath = storeResources()
         chai.spy.on(io.ios.CLI.out, ['send'])
         chai.spy.on(io.ios.TELEGRAM.out, ['send'])
-        chai.spy.on(console, ['error'])
     })
 
     afterEach(function () {
         chai.spy.restore(io.ios.TELEGRAM.out)
         chai.spy.restore(io.ios.CLI.out)
-        chai.spy.restore(console)
         restoreResources(storedResourcesPath)
     })
 
@@ -55,25 +52,26 @@ describe('IO', () => {
         })
 
         it("File doesn't exist", () => {
-            assert.isNull(io.loadFrom('test/resources/bla-bla.poo'), "Function should return NULL")
-            expect(console.error).to.have.been.called(1)
+            expect(
+                () => io.loadFrom('test/resources/bla-bla.poo'),
+                "Function should throw an error").to.throw(Error)
         })
 
         it("There is no used IO in configure", () => {
-            assert.isNull(io.loadFrom('test/resources/ios/invalid.yml'), "Function should return NULL")
-            expect(console.error).to.have.been.called(1)
+            expect(
+                () => io.loadFrom('test/resources/ios/invalid.yml'),
+                "Function should throw an error").to.throw(Error)
         })
     })
 
     context('Telegram', () => {
-        it("There is no Bot token in config file or env. variable", () => {
-            setBotTokenEnvVar('')
-            const emitter = new EventEmitter()
-            controller.run(emitter, io.ios.TELEGRAM)
-            emitter.emit("command", {name: commands.stopMotion.command_name})
-
-            expect(console.error).to.have.been.called(2)
-            expect(console.error).to.have.been.called.with("There is no Telegram bot API token found")
+        it("There is no Bot token in config file nor env. variable", () => {
+            expect(() => {
+                setBotTokenEnvVar('')
+                const emitter = new EventEmitter()
+                controller.run(emitter, io.ios.TELEGRAM)
+                emitter.emit("command", {name: commands.stopMotion.command_name})
+            }, 'Should throw an error').to.throw(Error,/There is no Telegram bot API token found/)
         })
 
         it("There is no Bot token in config file but it is in env. variable", () => {
@@ -81,8 +79,7 @@ describe('IO', () => {
             const emitter = new EventEmitter()
             controller.run(emitter, io.ios.TELEGRAM)
             emitter.emit("command", {name: commands.stopMotion.command_name})
-
-            expect(console.error).not.have.been.called
+            expect(io.ios.TELEGRAM.out.send).to.have.been.called(1)
         })
 
         it('Output work', () => {

@@ -195,7 +195,7 @@ exports.chkDetections = async (type, chatName) => {
         await addVideoDetection()
 
     const expectedMsgsNum = (type === 'image') ? newImgsThreshHold() : 1
-    const expectedCond = () => async () =>  (await messages(chatName)).length === expectedMsgsNum
+    const expectedCond = async () =>  (await messages(chatName)).length === expectedMsgsNum
     await waitUntilMsgsSent(expectedCond, 'There are no enough detection messages', 8000)
 
     const msgs = await messages(chatName)

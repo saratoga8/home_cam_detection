@@ -22,6 +22,8 @@ const yaml = require('js-yaml')
 
 const { waitUntil } = require('async-wait-until')
 
+const { stopEmulator, emulatorOutputFilePath, emulatorPath, chkMotionState } = require('../../test/motion_emulator')
+
 function setMotionEmulator() {
     const configPath = 'resources/detections.yml'
     const conf = yaml.load(fs.readFileSync(configPath, 'utf8'))
@@ -57,22 +59,7 @@ When('Sleep {int}s', async function (seconds) {
 });
 
 
-Then(/^The motion has (started|stopped|started by telegram|stopped by telegram)$/, async function (action) {
-    fs.truncateSync(this.program.outputPath)
-    const str = (action === 'started') ? "Starting motion" : "Stopping motion"
-    const expectedCondition = () => {
-        const txt = fs.readFileSync(this.program.outputPath)
-        return (txt.includes(str))
-    }
-    if (action.endsWith('telegram')) {
-        await sleepMs(3000)
-        assert(expectedCondition(), `There is no string '${str}' in the ${this.program.outputPath}`)
-    } else {
-        try {
-            await waitUntil(expectedCondition)
-        }
-        catch (e) {
-           assert.fail(`There is no string '${str}' in the ${this.program.outputPath}`)
-        }
-    }
+Then(/^The motion has (started|stopped)$/, async function (state) {
+    await sleepMs(500)
+    chkMotionState(state)
 })

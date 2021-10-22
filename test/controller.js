@@ -6,7 +6,7 @@ const commands = require('../src/commands')
 const EventEmitter = require("events")
 
 
-const {setMotionPath} = require('./utils')
+const {setMotionPath, sleepMs} = require('./utils')
 const detections = require('../src/detections')
 
 const spies = require('chai-spies')
@@ -18,43 +18,45 @@ const motionPath = require('js-yaml').load(fs.readFileSync('resources/detections
 
 chai.use(spies)
 const io = require('../src/ios/io')
+const {chkMotionState, stopEmulator} = require("./motion_emulator");
 
 let emitter = null
+
 
 describe('Controller', () => {
     before(function ()  { setMotionPath('test/resources/motion.sh') })
     after(async function ()  {
         setMotionPath(motionPath)
-        await fs.close
+        stopEmulator()
     })
     afterEach(function ()  {
-        chai.spy.restore(console)
+        controller.stop(emitter)
         chai.spy.restore(io.ios.CLI.out)
     })
     beforeEach(function ()  {
+        stopEmulator()
         emitter = new EventEmitter()
         chai.spy.on(io.ios.CLI.out, ['send'])
-        chai.spy.on(console, ['error', 'log', 'warn'])
     })
 
-    it('Controller stops motion', () => {
+    it('Controller stops motion', async () => {
         motion.start()
+        await sleepMs(500)
+        chkMotionState("started")
         controller.run(emitter)
-        emitter.emit("command", { name: commands.stopMotion.command_name} )
-        expect(console.log).to.have.been.called(3).with("Stopping motion").with("OK")
-        expect(console.error).to.have.not.been.called
+        emitter.emit("command", {name: commands.stopMotion.command_name})
+        chkMotionState("stopped")
     })
 
     it('Controller starts motion', () => {
         controller.run(emitter)
         emitter.emit("command", { name: commands.startMotion.command_name} )
-        expect(console.log).to.have.been.called(1).with("Starting motion")
-        expect(console.error).to.have.not.been.called
+        chkMotionState("started")
     })
 
     it('Controller detected motion', () => {
         detections.start(emitter)
-        controller.run(emitter, io.ios.CLI)
+        controller.run(emitter)
         emitter.emit("detected_motion", 'bla')
         expect(io.ios.CLI.out.send).to.have.been.called(1)
     })

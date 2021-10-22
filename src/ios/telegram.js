@@ -14,6 +14,8 @@ const confPath = 'resources/io.yml'
 const mediaGrpSize = 10
 const videoMaxSize = 52428800
 
+const { error, debug, warn } = require('../logger/logger')
+
 /**
  * Get used media message type. E.g 'image' or 'video'
  * @returns {string|*} String of the message type
@@ -28,6 +30,7 @@ const mediaMsgType = () => {
  * @returns {String|undefined} Token string or 'undefined'
  */
 function initToken() {
+    debug('Initialization of Telegram Bot token')
     const conf = yaml.load(readFileSync(confPath, 'utf8'))
     const telegram = conf.telegram
     return (telegram && telegram.token) ? telegram.token : process.env.TELEGRAM_BOT_TOKEN
@@ -41,6 +44,7 @@ let bot = null
  * @param txt Message's text
  */
 function sendMsg(txt) {
+    debug(`Sending the message '${txt}' to the Telegram Bot`)
     bot.sendMessage(chatID, txt).catch((err) => {
         console.error(`Can't send message ${txt} to chat with ID=${chatID}: ${err}`)
     })
@@ -51,6 +55,7 @@ function sendMsg(txt) {
  * @param {String} id The ID
  */
 function setChatID(id) {
+    debug(`Setting Telegram Chat ID to ${id}`)
     if(id !== chatID) {
         const conf = yaml.load(readFileSync(confPath, 'utf8'))
         const telegram = conf.telegram
@@ -60,7 +65,6 @@ function setChatID(id) {
         }
         chatID = id
     }
-    console.debug(`Chat ID = ${chatID}`)
 }
 
 /**
@@ -78,6 +82,7 @@ function loadChatID() {
  * @param {EventEmitter} emitter Emitter instance for sending events
  */
 function stopMotion(emitter) {
+    debug('Stopping Motion')
     emitter.emit("command", { name: commands.stopMotion.command_name} )
     sendMsg("OK")
 }
@@ -87,6 +92,7 @@ function stopMotion(emitter) {
  * @param {EventEmitter} emitter Emitter instance for sending events
  */
 function startMotion(emitter) {
+    debug('Starting Motion')
     emitter.emit("command", { name: commands.startMotion.command_name} )
     sendMsg("OK")
 }
@@ -95,6 +101,7 @@ function startMotion(emitter) {
  * Send text message with help about used commands
  */
 function help() {
+    debug('Sending help command to the Telegram Bot')
     const txt = "Used commands:\nhello - The first command after creating the bot\nstop - Stop visual detecting of any motion\nstart - Start visual detecting of any motion"
     sendMsg(txt)
 }
@@ -105,13 +112,15 @@ const bot_cmds = [
     {name: "stop", exec: (emitter) => { stopMotion(emitter) } },
     {name: "start", exec: (emitter) => { startMotion(emitter) }},
     {name: "help", exec: () => { help() }},
-    {name: "/start", exec: () => { sendMsg("Welcome")}} ]
+    {name: "/start", exec: () => { sendMsg("Welcome")}}
+]
 
 /**
  * Receive message from Telegram bot
  * @param {EventEmitter} emitter Emitter instance for sending events
  */
 function receiveBotMsg(emitter) {
+    debug('Receiving message from Telegram Bot')
     if(bot != null) {
         bot.on('message', (msg) => {
             setChatID(msg.chat.id)
@@ -131,11 +140,11 @@ function receiveBotMsg(emitter) {
  * Receive errors from Telegram bot
  */
 function receiveBotErr() {
-    if(bot != null) {
+    if(bot) {
         bot.on('error', (msg) => {
-            console.error(`There is error in connecting to Telegram Bot: ${msg.text.toString()}`)
+            throw new Error(`There is error in connecting to Telegram Bot: ${msg.text.toString()}`)
         })
-        bot.on("polling_error", (err) => console.log(err));
+        bot.on("polling_error", (err) => warn(err));
     }
 }
 
@@ -154,11 +163,11 @@ function sendPics(data) {
 }
 
 function sendTxt(data) {  ///////// TODO Should be replaced by using sendMsg(txt)
-    console.debug("Sending text message")
+    debug("Sending text message")
     if (bot)
         bot.sendMessage(chatID, data.text).catch((err) => console.error(`Can't send to telegram chat text message: ${err}`))
     else
-        console.error("Bot instance hasn't initialized")
+        throw new Error("Bot instance hasn't initialized")
 }
 
 /**
@@ -184,13 +193,13 @@ function sendVideo(data, minFileSizeByte) {
  * Initialization of Telegram bot
  */
 function initBot() {
-    console.debug("Initialization of Telegram Bot")
+    debug("Initialization of Telegram Bot")
     if(bot == null) {
         const token = initToken()
         if(token && token !== '')
             bot = new api(token, {polling: true})
         else
-            console.error("There is no Telegram bot API token found")
+            throw new Error("There is no Telegram bot API token found")
     }
 }
 
@@ -211,7 +220,7 @@ function sendDetections(data) {
     if (data.name in actions)
         actions[data.name]()
     else
-        console.error(`The type of detection '${data.name}' isn't supported for sending in Telegram`)
+        throw new Error(`The type of detection '${data.name}' isn't supported for sending in Telegram`)
 }
 
 exports.io = {
