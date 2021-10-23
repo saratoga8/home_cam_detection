@@ -48,7 +48,7 @@ describe('Detections use', async () => {
     it('start detecting when added images > thresh holder', async () => {
         detections.start(emitter)
         controller.run(emitter)
-        let p = emitter.should.emit(detections.eventStr);
+        emitter.should.emit(detections.eventStr);
         const imgsNum = newImgsThreshHold() + 2
         await addImgFiles(detectionsDirPath, imgsNum)
         await sleepMs(100)
@@ -72,6 +72,7 @@ describe('Detections use', async () => {
         const imgsNumStr = () => execSync(`ls ${detectionsDirPath}/*.jpg | wc -l`).toString()
         assert.isAtLeast(parseInt(imgsNumStr()), newFiles, "There is not enough added images")
         detections.cleanDir()
+        await sleepMs(100)
         assert.equal(parseInt(imgsNumStr()), maxSavedImgs, "Invalid number of saved detection images")
     })
 })

@@ -4,14 +4,20 @@ const sent_data = require('./sent_data')
 
 const { debug } = require('../logger/logger')
 
+const outputPath = '/tmp/out.txt'
+
+const fs = require('fs')
+
 exports.io = {
     out: {
         send: (data) => {
             if(data.name === sent_data.types.IMAGES.name) {
                 debug(`Sending images: ${data.paths}`)
+                fs.writeFileSync(outputPath, data.paths)
             }
             else if(data.name === sent_data.types.TXT.name) {
                 debug(`Sending text: ${data.txt}`)
+                fs.writeFileSync(outputPath, data.txt)
             }
             else if(data.name === sent_data.types.VIDEO.name) {
                  debug(`Sending video`)

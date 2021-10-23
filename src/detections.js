@@ -71,10 +71,10 @@ function processImg(emitter, filePath) {
             return
         }
         const threshold = newImgsThreshold()
-        if ((threshold !== undefined) && (count >= threshold)) {
+        if (threshold && (count >= threshold)) {
             if(count === threshold) {
-                emitEventWithLastImgsPaths(emitter)
                 count++
+                emitEventWithLastImgsPaths(emitter)
             }
             else {
                 count = 0
@@ -102,7 +102,7 @@ function processVideo(emitter, filePath) {
  * @param {EventEmitter} emitter Emitter instance for emitting events
  */
 function start(emitter) {
-    debug('Start detecting')
+    debug(`Start detecting in the directory ${dirPath}`)
     if(!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, {recursive: true})
     }
