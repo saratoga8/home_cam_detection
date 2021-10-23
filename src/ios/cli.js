@@ -13,11 +13,11 @@ exports.io = {
         send: (data) => {
             if(data.name === sent_data.types.IMAGES.name) {
                 debug(`Sending images: ${data.paths}`)
-                fs.writeFileSync(outputPath, data.paths)
+                fs.appendFileSync(outputPath, data.paths.toString())
             }
             else if(data.name === sent_data.types.TXT.name) {
                 debug(`Sending text: ${data.txt}`)
-                fs.writeFileSync(outputPath, data.txt)
+                fs.appendFileSync(outputPath, data.txt)
             }
             else if(data.name === sent_data.types.VIDEO.name) {
                  debug(`Sending video`)
