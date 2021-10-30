@@ -22,7 +22,7 @@ exports.stopEmulator = () => {
 }
 
 exports.chkMotionState = (state) => {
-    let processesPaths = execSync("ps -fu $USER | awk '{print $9}'")
+    let processesPaths = execSync("ps -fu $USER")
         .toString()
         .split(EOL)
     let found = processesPaths.find(path => path.includes(emulatorPath))

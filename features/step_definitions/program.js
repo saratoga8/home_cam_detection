@@ -24,7 +24,7 @@ const { stopEmulator, emulatorOutputFilePath, emulatorPath, chkMotionState } = r
 
 function setMotionEmulator() {
     const emulatorPath = '/tmp/motion.sh'
-    fs.writeFileSync(emulatorPath, 'echo "Motion started"', { encoding: 'utf-8', flag: 'w' })
+    fs.writeFileSync(emulatorPath, `echo "Motion started" > ${emulatorOutputFilePath}`, { encoding: 'utf-8', flag: 'w' })
     fs.chmodSync(emulatorPath, 0o777)
 
     const configPath = 'resources/detections.yml'
@@ -62,6 +62,8 @@ When('Sleep {int}s', async function (seconds) {
 
 
 Then(/^The motion has (started|stopped)$/, async function (state) {
-    await sleepMs(500)
-    chkMotionState(state)
+    if(state !== 'started') {
+        assert.fail("The step for the state hasn't implemented")
+    }
+    expect(file(emulatorOutputFilePath)).includes('Motion started')
 })
