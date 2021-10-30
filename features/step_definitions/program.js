@@ -20,14 +20,16 @@ const file = chaiFiles.file
 
 const yaml = require('js-yaml')
 
-const { waitUntil } = require('async-wait-until')
-
 const { stopEmulator, emulatorOutputFilePath, emulatorPath, chkMotionState } = require('../../test/motion_emulator')
 
 function setMotionEmulator() {
+    const emulatorPath = '/tmp/motion.sh'
+    fs.writeFileSync(emulatorPath, 'echo "Motion started"', { encoding: 'utf-8', flag: 'w' })
+    fs.chmodSync(emulatorPath, 0o777)
+
     const configPath = 'resources/detections.yml'
     const conf = yaml.load(fs.readFileSync(configPath, 'utf8'))
-    conf.paths.motion = path.resolve('test/resources/motion.sh')
+    conf.paths.motion = path.resolve(emulatorPath)
     fs.writeFileSync(configPath, yaml.dump(conf), 'utf8')
 }
 
