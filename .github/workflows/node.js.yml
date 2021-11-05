@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ logger ]
   pull_request:
-    branches: [ master ]
+    branches: [ logger ]
 
 jobs:
   build:
@@ -27,3 +27,4 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+    - run: npm run cucumber
