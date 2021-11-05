@@ -9,7 +9,7 @@
     "test": "npm run test:base && npm run test:telegram",
     "start": "node src/main.js --pid_path=bin/.pid",
     "stop": "cd bin && ./stop.sh && cd ..",
-    "cucumber": "cucumber-js features/program.feature"
+    "cucumber": "cucumber-js features/motion.feature"
   },
   "repository": {
     "type": "git",
