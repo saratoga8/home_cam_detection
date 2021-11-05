@@ -1,0 +1,47 @@
+version: "1.0"
+stages:
+  - "clone"
+  - "build"
+  - "test"
+  - "notifications"
+
+steps:
+  clone:
+    title: "Cloning repository"
+    type: "git-clone"
+    repo: "saratoga8/home_cam_detection"
+    revision: "${{CF_BRANCH}}"
+    git: "github"
+    stage: "clone"
+
+  build:
+    title: "Building Docker image"
+    type: "build"
+    image_name: "home_cam_detection"
+    working_directory: "${{clone}}"
+    tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
+    dockerfile: "Dockerfile"
+    stage: "build"
+
+  unit_tests:
+    title: "Running unit tests"
+    type: "freestyle" # Run any command
+    image: ${{build}}
+    working_directory: "${{clone}}" # Running command where code cloned
+    commands:
+      - npm install && npm test
+    stage: "test"
+
+  func_tests:
+    title: "Running Cucumber test"
+    type: "freestyle" # Run any command
+    image: ${{build}}
+    working_directory: "${{clone}}" # Running command where code cloned
+    commands:
+      - npm run cucumber
+    stage: "test"
+    when:
+      steps:
+        - name: unit_tests
+          on:
+            - success
