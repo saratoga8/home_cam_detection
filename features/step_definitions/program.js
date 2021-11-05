@@ -20,7 +20,7 @@ const file = chaiFiles.file
 
 const yaml = require('js-yaml')
 
-const { stopEmulator, emulatorOutputFilePath, emulatorPath, chkMotionState } = require('../../test/motion_emulator')
+const { emulatorOutputFilePath } = require('../../test/motion_emulator')
 
 function setMotionEmulator() {
     const emulatorPath = '/tmp/motion.sh'
