@@ -6,20 +6,11 @@ const { copySync, removeSync } = require('fs-extra')
 const { waitUntil } = require('async-wait-until')
 const {execSync} = require('child_process')
 
+
 const chai = require('chai')
 const assert = chai.assert
-// const waitUntil = async (expectedCondition, timeoutSec, stepMSec = 100) => {
-//     const times = timeoutSec * 1000 / stepMSec
-//     let result = false
-//     for (let i = 0; i < times; ++i) {
-//         setTimeout(async () => {
-//             result = await expectedCondition()
-//         }, stepMSec)
-//         if(result)
-//             break
-//     }
-//     return result
-// }
+
+const { finishedVideoNotificationsDirPath } = require('../src/detections')
 
 const config_path = 'resources/detections.yml'
 const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
@@ -42,7 +33,7 @@ exports.addVideo = async (destPath) => {
     const videoPath = resourcesPath + sep + fileName
     await fs.copyFileSync(videoPath, destPath + sep + fileName)
     fileName = 'video.finished'
-    await fs.copyFileSync(resourcesPath + sep + fileName, `/tmp/${fileName}`)
+    await fs.copyFileSync(resourcesPath + sep + fileName, `${finishedVideoNotificationsDirPath}/${fileName}`)
 }
 
 exports.setMotionPath = (emulatorPath) => {
