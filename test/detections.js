@@ -4,7 +4,7 @@ const {execSync} = require('child_process')
 const chai = require('chai')
 const assert = chai.assert
 const expect = chai.expect
-const should = chai.should()
+chai.should()
 chai.use(require("chai-events"));
 const EventEmitter = require("events");
 
@@ -18,7 +18,8 @@ chai.use(spies)
 const io = require('../src/ios/io')
 const controller = require('../src/controller')
 
-const tmpFilePath = '/tmp/video.finished'
+const { finishedVideoNotificationsDirPath } = require('../src/detections')
+const tmpFilePath = `${finishedVideoNotificationsDirPath}/video.finished`
 
 describe('Detections use', async () => {
     beforeEach( () => {

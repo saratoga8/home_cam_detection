@@ -2,6 +2,7 @@ const yaml = require('js-yaml')
 const fs = require('fs')
 const { spawn, spawnSync } = require('child_process')
 
+const motionConfPath = 'resources/motion.conf'
 const config_path = 'resources/detections.yml'
 let childProcess = null
 
@@ -28,7 +29,7 @@ function start () {
     }
     if(childProcess == null) {
       const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
-      childProcess = spawn(conf.paths.motion, ['-c', 'resources/motion.conf'])
+      childProcess = spawn(conf.paths.motion, ['-c', motionConfPath])
       debug("Starting motion")  // TODO Should be added checking of stopping
     }
   } catch (e) {

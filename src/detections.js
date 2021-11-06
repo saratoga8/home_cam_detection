@@ -10,10 +10,12 @@ const chokidar = require('chokidar')
 
 const config_path = 'resources/detections.yml'
 const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
-const dirPath = resolve(__dirname, "../motion/detections")
+const detectionsDirPath = resolve(__dirname, "../motion/detections")
 const imgExt = conf.extensions.img
 const videoExt = conf.extensions.video
 const minTimeBetweenDetectionsSeconds = conf.seconds_between_detections
+
+const finishedVideoNotificationsDirPath = '.tmp'
 
 const sentData = require('./ios/sent_data')
 
@@ -50,9 +52,9 @@ const newImgsThreshold = () => {
  * @returns {string[]} Paths
  */
 function getFilePathsInDetectionsDir(fileExtension) {
-    return fs.readdirSync(dirPath)
+    return fs.readdirSync(detectionsDirPath)
         .filter(file => extname(file).slice(1) === fileExtension)
-        .map(file => dirPath.concat(sep, file))
+        .map(file => detectionsDirPath.concat(sep, file))
 }
 
 function emitEventWithLastImgsPaths(emitter) {
@@ -95,6 +97,12 @@ function processVideo(emitter, filePath) {
     }
 }
 
+const createDir = (path) => {
+    if(!fs.existsSync(path)) {
+        fs.mkdirSync(path, { recursive: true })
+    }
+}
+
 /**
  * Starts detecting: watching for directory of motion's detections for new files.
  * The func counts the new files and after a threshold emits event.
@@ -102,15 +110,14 @@ function processVideo(emitter, filePath) {
  * @param {EventEmitter} emitter Emitter instance for emitting events
  */
 function start(emitter) {
-    debug(`Start detecting in the directory ${dirPath}`)
-    if(!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath, {recursive: true})
-    }
+    debug(`Start detecting in the directory ${detectionsDirPath}`)
+    createDir(detectionsDirPath)
+    createDir(finishedVideoNotificationsDirPath)
 
     const imgsListener = (path) => processImg(emitter, path)
-    imgFilesWatcher = chokidar.watch(dirPath).on('add', imgsListener)
+    imgFilesWatcher = chokidar.watch(detectionsDirPath).on('add', imgsListener)
     const videoListener = (path) => processVideo(emitter, path)
-    tmpDirWather = chokidar.watch('/tmp').on('add', videoListener)
+    tmpDirWather = chokidar.watch(finishedVideoNotificationsDirPath).on('add', videoListener)
 }
 
 /**
@@ -158,6 +165,8 @@ exports.cleanDir = cleanDir
 /** String of detections event */
 exports.eventStr = eventStr
 /** Path to the directory containing detections (videos/images) */
-exports.dirPath = dirPath
+exports.dirPath = detectionsDirPath
 /** Stop detections */
 exports.stop = stop
+
+exports.finishedVideoNotificationsDirPath = finishedVideoNotificationsDirPath
