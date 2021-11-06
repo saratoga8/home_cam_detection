@@ -2,18 +2,26 @@ const commands = require('../commands')
 const readline = require('readline')
 const sent_data = require('./sent_data')
 
+const { debug } = require('../logger/logger')
+
+const outputPath = '/tmp/out.txt'
+
+const fs = require('fs')
+
 exports.io = {
     out: {
         send: (data) => {
             if(data.name === sent_data.types.IMAGES.name) {
-                console.log(data.paths)
+                debug(`Sending images: ${data.paths}`)
+                fs.appendFileSync(outputPath, data.paths.toString())
             }
             else if(data.name === sent_data.types.TXT.name) {
-                console.log(data.txt)
+                debug(`Sending text: ${data.txt}`)
+                fs.appendFileSync(outputPath, data.txt)
             }
-            // else if(data.name === sent_data.types.VIDEO.name) {
-            //     console.log("bla")
-            // }
+            else if(data.name === sent_data.types.VIDEO.name) {
+                 debug(`Sending video`)
+            }
         }
     },
     in: {

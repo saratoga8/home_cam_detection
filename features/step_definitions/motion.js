@@ -14,6 +14,8 @@ const { resolve } = require('path')
 
 const { waitUntil } = require('async-wait-until')
 
+const { finishedVideoNotificationsDirPath } = require('../../src/detections')
+
 When(/^There are detections with number (more|less) than threshold$/, async function (action) {
     expect(detectionsDirPath).to.be.a.directory()
     const imgsNumBefore = fs.readdirSync(detectionsDirPath).length
@@ -57,5 +59,5 @@ Given(/^There is video detection$/, async function () {
     const videoPath = resolve('test/resources/video.mp4')
     expect(videoPath, "The file with video doesn't exist").to.be.exist
     await fs.copyFileSync(videoPath, `${detectionsDirPath}/video.mp4`)
-    await fs.copyFileSync('test/resources/video.finished', `/tmp/video.finished`)
+    await fs.copyFileSync('test/resources/video.finished', `${finishedVideoNotificationsDirPath}/video.finished`)
 });

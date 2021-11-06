@@ -20,12 +20,16 @@ const file = chaiFiles.file
 
 const yaml = require('js-yaml')
 
-const { waitUntil } = require('async-wait-until')
+const { emulatorOutputFilePath } = require('../../test/motion_emulator')
 
 function setMotionEmulator() {
+    const emulatorPath = '/tmp/motion.sh'
+    fs.writeFileSync(emulatorPath, `echo "Motion started" > ${emulatorOutputFilePath}`, { encoding: 'utf-8', flag: 'w' })
+    fs.chmodSync(emulatorPath, 0o777)
+
     const configPath = 'resources/detections.yml'
     const conf = yaml.load(fs.readFileSync(configPath, 'utf8'))
-    conf.paths.motion = path.resolve('test/resources/motion.sh')
+    conf.paths.motion = path.resolve(emulatorPath)
     fs.writeFileSync(configPath, yaml.dump(conf), 'utf8')
 }
 
@@ -57,22 +61,9 @@ When('Sleep {int}s', async function (seconds) {
 });
 
 
-Then(/^The motion has (started|stopped|started by telegram|stopped by telegram)$/, async function (action) {
-    fs.truncateSync(this.program.outputPath)
-    const str = (action === 'started') ? "Starting motion" : "Stopping motion"
-    const expectedCondition = () => {
-        const txt = fs.readFileSync(this.program.outputPath)
-        return (txt.includes(str))
+Then(/^The motion has (started|stopped)$/, async function (state) {
+    if(state !== 'started') {
+        assert.fail("The step for the state hasn't implemented")
     }
-    if (action.endsWith('telegram')) {
-        await sleepMs(3000)
-        assert(expectedCondition(), `There is no string '${str}' in the ${this.program.outputPath}`)
-    } else {
-        try {
-            await waitUntil(expectedCondition)
-        }
-        catch (e) {
-           assert.fail(`There is no string '${str}' in the ${this.program.outputPath}`)
-        }
-    }
+    expect(file(emulatorOutputFilePath)).includes('Motion started')
 })

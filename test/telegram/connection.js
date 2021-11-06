@@ -149,6 +149,11 @@ exports.runTelegram = () => {
     const emitter = new EventEmitter()
     controller.run(emitter, io.ios.TELEGRAM)
     io.ios.TELEGRAM.in.receive(emitter)
+    return emitter
+}
+
+exports.stopTelegram = (emitter) => {
+    controller.stop(emitter)
 }
 
 exports.chkChatClearing = async (chatName) => {
@@ -195,7 +200,11 @@ exports.chkDetections = async (type, chatName) => {
         await addVideoDetection()
 
     const expectedMsgsNum = (type === 'image') ? newImgsThreshHold() : 1
-    const expectedCond = () => async () =>  (await messages(chatName)).length === expectedMsgsNum
+    const expectedCond = async () => {
+        const actual = (await messages(chatName)).length
+        console.log(`Expected: ${expectedMsgsNum}, actual: ${actual}`)
+        return actual === expectedMsgsNum
+    }
     await waitUntilMsgsSent(expectedCond, 'There are no enough detection messages', 8000)
 
     const msgs = await messages(chatName)

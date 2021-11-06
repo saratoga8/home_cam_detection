@@ -1,30 +1,33 @@
 const yaml = require('js-yaml')
 const config_path = 'resources/detections.yml'
 const fs = require('fs')
-const motion = require('../src/motion')
+
 const chai = require('chai')
 const assert = chai.assert
-const expect = chai.expect
+
+
+const motion = require('../src/motion')
+
+
+
 const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
 const motionPath = conf.paths.motion
-chai.use(require("chai-events"));
-chai.use(require('chai-as-promised'))
 
-const chaiFiles = require('chai-files')
-chai.use(chaiFiles);
+const { setMotionPath, sleepMs} = require('./utils')
+const { stopEmulator, emulatorOutputFilePath, emulatorPath, chkMotionState } = require("./motion_emulator");
 
 
-const spies = require('chai-spies')
-chai.use(spies)
 
-const {setMotionPath} = require('./utils')
 
 describe('Motion use', () => {
-    after(() => { setMotionPath(motionPath) })
-    afterEach(function () { chai.spy.restore(console) })
+    after(() => {
+        setMotionPath(motionPath)
+        stopEmulator()
+    })
     beforeEach(function ()  {
-        chai.spy.on(console, ['error', 'log', 'warn'])
-        setMotionPath('test/resources/motion.sh')
+        fs.rmSync(emulatorOutputFilePath, { force: true })
+        setMotionPath(emulatorPath)
+        stopEmulator()
     })
 
     it("Motion hasn't installed", async () => {
@@ -36,43 +39,43 @@ describe('Motion use', () => {
         assert.isFalse(result, "Motion HAS installed")
     })
 
-    it("Motion starting and stopping", () => {
+    it("Motion starting and stopping", async () => {
         motion.start()
-        expect(console.log).to.have.been.called.once.with("Starting motion")
+        chkMotionState("started")
+        await sleepMs(500)
         motion.stop()
-        expect(console.log).to.have.been.called(2).with("Stopping motion")
-        expect(console.error).to.have.not.been.called
+        chkMotionState("stopped")
     })
 
-    it("Motion re-start", () => {
+    it("Motion re-start", async () => {
         motion.start()
-        expect(console.log).to.have.been.called.once.with("Starting motion")
+        chkMotionState("started")
+        await sleepMs(500)
         motion.stop()
-        expect(console.log).to.have.been.called(2).with("Stopping motion")
+        chkMotionState("stopped")
         motion.start()
-        expect(console.log).to.have.been.called(3).with("Starting motion")
+        chkMotionState("started")
+        await sleepMs(500)
         motion.stop()
-        expect(console.log).to.have.been.called(4).with("Stopping motion")
-        expect(console.error).to.have.not.been.called
+        chkMotionState("stopped")
     })
 
-    it("Motion repeated starting", () => {
+    it("Motion repeated starting", async () => {
         motion.start()
+        await sleepMs(500)
         motion.start()
-        expect(console.log).to.have.been.called(3).with("Starting motion")
-        expect(console.log).to.have.been.called(3).with("Stopping motion")
-        expect(console.warn).to.have.been.called(1).with("Killing previous instance of motion")
+        chkMotionState("started")
+        await sleepMs(500)
         motion.stop()
         motion.stop()
-        expect(console.log).to.have.been.called(4)
-        expect(console.error).to.have.not.been.called
+        chkMotionState("stopped")
     })
 
-    it("Motion repeated stopping", () => {
+    it("Motion repeated stopping", async () => {
         motion.start()
+        await sleepMs(500)
         motion.stop()
         motion.stop()
-        expect(console.log).to.have.been.called(2).with("Stopping motion")
-        expect(console.error).to.have.not.been.called
+        chkMotionState("stopped")
     })
 })

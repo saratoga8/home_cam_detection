@@ -9,7 +9,7 @@
     "test": "npm run test:base && npm run test:telegram",
     "start": "node src/main.js --pid_path=bin/.pid",
     "stop": "cd bin && ./stop.sh && cd ..",
-    "cucumber": "cucumber-js features/*.feature"
+    "cucumber": "cucumber-js features/motion.feature"
   },
   "repository": {
     "type": "git",
@@ -20,13 +20,14 @@
     "dotenv": "^10.0.0",
     "js-yaml": "^4.1.0",
     "jsdoc": "^3.6.6",
+    "log4js": "^6.3.0",
     "node-telegram-bot-api": "^0.54.0",
     "process": "^0.11.10",
     "yargs": "^17.1.0"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^7.3.1",
-    "async-wait-until": "^2.0.5",
+    "async-wait-until": "^2.0.7",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "chai-events": "^0.0.3",
@@ -37,9 +38,8 @@
     "chai-spies": "^1.0.0",
     "eslint": "^7.21.0",
     "eslint-plugin-chai-friendly": "^0.6.0",
-    "mocha": "^9.0.3",
-    "read-last-lines": "^1.8.0",
-    "fs-extra": "^10.0.0"
+    "fs-extra": "^10.0.0",
+    "mocha": "^9.1.2"
   },
   "engines": {
     "node": ">=14.16.1"

@@ -2,7 +2,7 @@ const chai = require('chai')
 const expect = chai.expect
 
 const { clrDir, storeResources, restoreResources, detectionsDirPath } = require('../utils')
-const { chkChatClearing, runTelegram, sendAndReceiveTxtMsg, chkDetections, setTelegramBotToken } = require("./connection")
+const { chkChatClearing, runTelegram, sendAndReceiveTxtMsg, chkDetections, setTelegramBotToken, stopTelegram} = require("./connection")
 
 const chatName = 'Home camera'
 
@@ -26,14 +26,18 @@ const beforeCommon = () => {
 
 describe('Sending detections and managing via Telegram', function () {
     let storedResourcesPath
+    let emitter
 
     this.timeout(10000)
 
-    after(() => restoreResources(storedResourcesPath))
+    after(() => {
+        restoreResources(storedResourcesPath)
+        stopTelegram(emitter)
+    })
 
     before(async () => {
         storedResourcesPath = beforeCommon()
-        runTelegram()
+        emitter = runTelegram()
     })
 
     beforeEach(async () => await beforeEachCommon())
@@ -53,7 +57,7 @@ describe('Sending detections and managing via Telegram', function () {
     context('Sending detections', () => {
         const detectionsTests = [
             { type: 'video' },
-            { type: 'image' }
+//            { type: 'image' }
         ]
 
         detectionsTests.forEach(({type}) => {

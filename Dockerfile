@@ -1,4 +1,4 @@
-FROM node:16.6.2-bullseye-slim
+FROM node:16.6-bullseye-slim
 
 WORKDIR /usr/src/home_cam
 VOLUME ["/usr/src/home_cam"]
@@ -13,5 +13,7 @@ COPY bin bin
 RUN touch /tmp/stam && rm /tmp/stam
 
 RUN mkdir -p motion/detections
+
+RUN apt-get update && apt-get install procps
 
 ENTRYPOINT ["/bin/bash"]

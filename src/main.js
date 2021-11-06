@@ -10,35 +10,70 @@ const args = require('yargs').argv
 const pid_path = args.pid_path
 
 const EventEmitter = require("events")
+const emitter = new EventEmitter()
 
-const io = require('./ios/io').loadFrom('resources/io.yml')
-if(io == null) {
-    console.error("Loading IO instance failed")
-    process.exit(1)
+const { error, debug } = require('../src/logger/logger')
+
+
+/**
+ * Stop the program when the signal of killing has gotten
+ */
+const stopOnKillSignal = () => {
+    process.on('SIGTERM', () => {
+        motion.stop()
+        detections.stop()
+        controller.stop(emitter)
+        debug("Exiting")
+        process.exit()
+    })
 }
 
-process.on('SIGTERM', () => {
-    motion.stop()
-    console.log("Exiting")
-    process.exit()
-})
+const startProgramParts = (io) => {
+    detections.start(emitter)
+    motion.start()
+    controller.run(emitter, io)
+    io.in.receive(emitter)
+}
 
-if(motion.hasInstalled()) {
-    if(pid_path !== undefined) {
-        fs.writeFile(pid_path, process.pid.toString(), err => {
-            if (err) {
-                console.error(`Can't write PID to the file ${pid_path}: ${err.message}`)
-                process.exit(9)
-            }
-        })
-        const emitter = new EventEmitter()
-        detections.start(emitter)
-        motion.start()
-        controller.run(emitter, io)
-        io.in.receive(emitter)
-        setInterval(() => {}, 500)
+const saveProgramPID = () => {
+    const pid = process.pid.toString()
+    debug(`Save program PID ${pid} to the file ${pid_path}`)
+    fs.writeFile(pid_path, pid, err => {
+        if (err) {
+            throw new Error(`Can't write PID to the file ${pid_path}: ${err.message}`)
+        }
+    })
+}
+
+/**
+ * Start the program with the given IO instance
+ * @param io {ios} IO object (e.g. CLI or TELEGRAM)
+ */
+const startProgram = (io) => {
+    debug('Starting program')
+    saveProgramPID()
+    startProgramParts(io)
+    setInterval(() => {}, 500)
+}
+
+try {
+    const io = require('./ios/io').loadFrom('resources/io.yml')
+
+    stopOnKillSignal()
+
+    if(motion.hasInstalled()) {
+        if(pid_path) {
+            startProgram(io)
+        }
+        else
+            throw new Error("There is no parameter: path of file for saving PID")
     }
-    else console.error("ERROR: There is no parameter: path of file for saving PID")
+    else
+        throw new Error("The motion isn't installed")
 }
-else
+catch (err) {
+    error(`Can't start the program: ${err}`)
     process.exit(9)
+}
+
+

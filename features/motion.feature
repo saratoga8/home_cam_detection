@@ -5,7 +5,7 @@ Feature: Motion detecting by program
     Given There are no detections in directory
     And User sets time between detections 2s
     When User starts program with io CLI
-    And The motion has started
+#    And The motion has started
 
   Scenario Outline: User starts motions detecting
     And There are detections with number <sign> than threshold

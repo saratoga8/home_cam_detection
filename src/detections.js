@@ -4,18 +4,24 @@ const yaml = require('js-yaml')
 const fs = require('fs')
 const { sep, extname, resolve } = require('path')
 
+const { debug } = require('./logger/logger')
+
 const chokidar = require('chokidar')
 
 const config_path = 'resources/detections.yml'
 const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
-const dirPath = resolve(__dirname, "../motion/detections")
+const detectionsDirPath = resolve(__dirname, "../motion/detections")
 const imgExt = conf.extensions.img
 const videoExt = conf.extensions.video
 const minTimeBetweenDetectionsSeconds = conf.seconds_between_detections
 
+const finishedVideoNotificationsDirPath = '.tmp'
+
 const sentData = require('./ios/sent_data')
 
 let count = 0
+
+let imgFilesWatcher, tmpDirWather
 
 /**
  * String of detection event
@@ -45,30 +51,32 @@ const newImgsThreshold = () => {
  * @param fileExtension File extension
  * @returns {string[]} Paths
  */
-function paths(fileExtension) {
-    return fs.readdirSync(dirPath)
+function getFilePathsInDetectionsDir(fileExtension) {
+    return fs.readdirSync(detectionsDirPath)
         .filter(file => extname(file).slice(1) === fileExtension)
-        .map(file => dirPath.concat(sep, file))
+        .map(file => detectionsDirPath.concat(sep, file))
 }
 
 function emitEventWithLastImgsPaths(emitter) {
+    debug('Emit event of detection')
     const data = Object.create(sentData.types.IMAGES)
-    data.paths = sortPaths(paths(imgExt)).slice(0, count)
+    data.paths = sortPaths(getFilePathsInDetectionsDir(imgExt)).slice(0, count)
     emitter.emit(eventStr, data)
 }
 
 function processImg(emitter, filePath) {
     if (filePath.endsWith(`.${imgExt}`)) {
+        debug(`Processing image ${filePath}`)
         if ((toNowSeconds() - lastDetectionDate) > minTimeBetweenDetectionsSeconds) {
             count = 0
             lastDetectionDate = toNowSeconds()
             return
         }
         const threshold = newImgsThreshold()
-        if ((threshold !== undefined) && (count >= threshold)) {
+        if (threshold && (count >= threshold)) {
             if(count === threshold) {
-                emitEventWithLastImgsPaths(emitter)
                 count++
+                emitEventWithLastImgsPaths(emitter)
             }
             else {
                 count = 0
@@ -80,11 +88,18 @@ function processImg(emitter, filePath) {
 
 function processVideo(emitter, filePath) {
     if (filePath.endsWith('video.finished')) {
-        const path = sortPaths(paths(videoExt))[0]
+        debug('Processing video')
+        const path = sortPaths(getFilePathsInDetectionsDir(videoExt))[0]
         const data = Object.create(sentData.types.VIDEO)
         data.path = path
         emitter.emit(eventStr, data)
         cleanDir()
+    }
+}
+
+const createDir = (path) => {
+    if(!fs.existsSync(path)) {
+        fs.mkdirSync(path, { recursive: true })
     }
 }
 
@@ -95,22 +110,32 @@ function processVideo(emitter, filePath) {
  * @param {EventEmitter} emitter Emitter instance for emitting events
  */
 function start(emitter) {
-    if(!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath, {recursive: true})
-    }
+    debug(`Start detecting in the directory ${detectionsDirPath}`)
+    createDir(detectionsDirPath)
+    createDir(finishedVideoNotificationsDirPath)
 
     const imgsListener = (path) => processImg(emitter, path)
-    chokidar.watch(dirPath).on('add', imgsListener)
+    imgFilesWatcher = chokidar.watch(detectionsDirPath).on('add', imgsListener)
     const videoListener = (path) => processVideo(emitter, path)
-    chokidar.watch('/tmp').on('add', videoListener)
+    tmpDirWather = chokidar.watch(finishedVideoNotificationsDirPath).on('add', videoListener)
 }
 
-
+/**
+ * Stopping detecting
+ */
+function stop() {
+    debug('Stop detecting')
+    if (imgFilesWatcher)
+        imgFilesWatcher.close()
+    if (tmpDirWather)
+        tmpDirWather.close()
+}
 
 /**
  * Cleaning detections directory
  */
 function cleanDir() {
+    debug('Clean detections directory')
     delFiles(imgExt, conf.max_saved_imgs)
     delFiles(videoExt, conf.max_saved_videos)
 }
@@ -126,7 +151,8 @@ function sortPaths(paths) {
  * @param maxSavedFiles Number of latest files should be saved
  */
 function delFiles(fileExtension, maxSavedFiles) {
-    const sorted = sortPaths(paths(fileExtension))
+    debug(`Deleting files *.${fileExtension}`)
+    const sorted = sortPaths(getFilePathsInDetectionsDir(fileExtension))
     const delElementsNum = sorted.length - maxSavedFiles
     if(delElementsNum > 0)
         sorted.slice(sorted.length - delElementsNum).forEach(fs.unlinkSync)
@@ -139,4 +165,8 @@ exports.cleanDir = cleanDir
 /** String of detections event */
 exports.eventStr = eventStr
 /** Path to the directory containing detections (videos/images) */
-exports.dirPath = dirPath
+exports.dirPath = detectionsDirPath
+/** Stop detections */
+exports.stop = stop
+
+exports.finishedVideoNotificationsDirPath = finishedVideoNotificationsDirPath
