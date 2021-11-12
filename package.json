@@ -4,11 +4,11 @@
   "description": "Detecting motion by camera and notifying user",
   "main": "src/main.js",
   "scripts": {
-    "test:base": "mocha test/*.js --exit",
-    "test:telegram": "mocha test/telegram/*.js --exit",
-    "test": "npm run test:base && npm run test:telegram",
     "start": "node src/main.js --pid_path=bin/.pid",
     "stop": "cd bin && ./stop.sh && cd ..",
+    "test": "npm run test:base && npm run test:telegram",
+    "test:base": "mocha test/*.js --exit",
+    "test:telegram": "mocha test/telegram/*.js --exit",
     "cucumber": "cucumber-js features/motion.feature"
   },
   "repository": {
@@ -19,11 +19,12 @@
     "chokidar": "^3.5.2",
     "dotenv": "^10.0.0",
     "js-yaml": "^4.1.0",
-    "jsdoc": "^3.6.6",
+    "jsdoc": "^3.6.7",
     "log4js": "^6.3.0",
     "node-telegram-bot-api": "^0.54.0",
     "process": "^0.11.10",
-    "yargs": "^17.1.0"
+    "stable": "^0.1.8",
+    "yargs": "^17.2.1"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^7.3.1",
@@ -36,13 +37,13 @@
     "chai-fs": "^2.0.0",
     "chai-http": "^4.3.0",
     "chai-spies": "^1.0.0",
-    "eslint": "^7.21.0",
-    "eslint-plugin-chai-friendly": "^0.6.0",
+    "eslint": "^8.2.0",
+    "eslint-plugin-chai-friendly": "^0.7.2",
     "fs-extra": "^10.0.0",
-    "mocha": "^9.1.2"
+    "mocha": "^9.1.3"
   },
   "engines": {
-    "node": ">=14.16.1"
+    "node": ">=16.13.0"
   },
   "keywords": [
     "video_detection"
