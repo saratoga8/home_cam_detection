@@ -4,7 +4,6 @@ const fs = require('fs')
 const { tmpdir } = require('os')
 const { copySync, removeSync } = require('fs-extra')
 const { waitUntil } = require('async-wait-until')
-const {execSync} = require('child_process')
 
 
 const chai = require('chai')
@@ -65,7 +64,8 @@ exports.restoreResources = (fromPath) => {
 }
 
 exports.clrDir = async (dirPath) => {
-    execSync(`rm -rf ${dirPath}/*.*`)
+    fs.readdirSync(dirPath).map(name => `${dirPath}/${name}`).forEach(path => fs.rmSync(path))
+
     const isDirEmpty = () => fs.readdirSync(dirPath).length === 0
     try {
         await waitUntil(isDirEmpty, {timeout: 3000})
