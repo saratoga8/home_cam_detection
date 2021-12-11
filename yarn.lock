@@ -300,10 +300,10 @@ async-arrays@*:
   dependencies:
     sift "*"
 
-async-wait-until@^2.0.7:
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/async-wait-until/-/async-wait-until-2.0.8.tgz#fea0a56753fd82ae66f07a8fe5796fbff2e8f647"
-  integrity sha512-G4vSYNJnFW6f83I080+1cGwymShQWuEHnNueS4Q0uNQctXAXaIdysPKYl1ax86/0VA8cVrQGKAqIDtqep3mm5g==
+async-wait-until@^2.0.9:
+  version "2.0.9"
+  resolved "https://registry.yarnpkg.com/async-wait-until/-/async-wait-until-2.0.9.tgz#012d095acd6851df289547ae62a49f992bb715b8"
+  integrity sha512-7OcRG5HH7+B0R77OlqavmlsEazLexaB1VnCmw4fAcVabCmwSF00DYRaa4tqHCFnZp0XbIJAEld1JSUuxg78kSw==
 
 asynckit@^0.4.0:
   version "0.4.0"
@@ -1793,10 +1793,10 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
-node-telegram-bot-api@^0.54.0:
-  version "0.54.0"
-  resolved "https://registry.yarnpkg.com/node-telegram-bot-api/-/node-telegram-bot-api-0.54.0.tgz#1a857ddeb2f523d81c8e10a1b70169c7cf069ff5"
-  integrity sha512-ckrpY/ABFLwA1DUzEc9iEQtsgQs8WcGC6m7iJ1bbnH+c7EOLnMdCfw+hUesyfuwOfAkkECYFxvoW4lJNy+Oztw==
+node-telegram-bot-api@^0.56.0:
+  version "0.56.0"
+  resolved "https://registry.yarnpkg.com/node-telegram-bot-api/-/node-telegram-bot-api-0.56.0.tgz#caf653574ed30530e2855a038b4d806f65c48677"
+  integrity sha512-gKUlH/uUXdSJ++6y1Y16qEThZouecfl4twuPKe6V2BPFDDfom9j2QMlxfslPEjZPH2ZXlA1S/uoRCKtIjzuaLw==
   dependencies:
     array.prototype.findindex "^2.0.2"
     bl "^1.2.3"

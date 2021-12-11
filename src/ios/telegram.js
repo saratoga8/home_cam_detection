@@ -14,7 +14,7 @@ const confPath = 'resources/io.yml'
 const mediaGrpSize = 10
 const videoMaxSize = 52428800
 
-const { error, debug, warn } = require('../logger/logger')
+const { debug, warn } = require('../logger/logger')
 
 /**
  * Get used media message type. E.g 'image' or 'video'
@@ -36,7 +36,7 @@ function initToken() {
     return (telegram && telegram.token) ? telegram.token : process.env.TELEGRAM_BOT_TOKEN
 }
 
-let chatID = null
+let chatID = undefined
 let bot = null
 
 /**
@@ -51,16 +51,28 @@ function sendMsg(txt) {
 }
 
 /**
+ * Initialisation of a chat ID from config file or from a environment variable
+ * @return {string} Chat's ID
+ */
+function initChatID() {
+    if (!process.env.TELEGRAM_BOT_CHAT) {
+        const conf = yaml.load(readFileSync(confPath, 'utf8'))
+        return conf.telegram.chatID
+    }
+    return process.env.TELEGRAM_BOT_CHAT
+}
+
+/**
  * Set chat ID of the Telegram bot
  * @param {String} id The ID
  */
 function setChatID(id) {
     debug(`Setting Telegram Chat ID to ${id}`)
+    const conf = yaml.load(readFileSync(confPath, 'utf8'))
+    const telegram = conf.telegram
     if(id !== chatID) {
-        const conf = yaml.load(readFileSync(confPath, 'utf8'))
-        const telegram = conf.telegram
         if(telegram.chatID !== id) {
-            conf.telegram.chatID = id
+            telegram.chatID = id
             writeFileSync(confPath, yaml.dump(conf, 'utf8'), (err => console.error(`Can't write to file ${confPath}: ${err}`)))
         }
         chatID = id
@@ -153,11 +165,12 @@ function receiveBotErr() {
  * @param {Object} data Object containing name of the sent data and paths of images {@link sent_data}
  */
 function sendPics(data) {
+    debug("Sending pictures")
     if(data.name.startsWith(mediaMsgType())) {
         for(let i = 0; i < data.paths.length; i += mediaGrpSize) {
             const pathsArr = (i + mediaGrpSize > data.paths.length) ? data.paths.slice(i) : data.paths.slice(i, mediaGrpSize)
             const mediaGrp = pathsArr.map(path => { return {type: 'photo', media: path}})
-            bot.sendMediaGroup(chatID, mediaGrp).catch((err) => console.error(`Can't send to telegram group of images: ${err}`))
+            bot.sendMediaGroup(chatID, mediaGrp).catch((err) => console.error(`Can't send to telegram a group of images: ${err}`))
         }
     }
 }
@@ -176,8 +189,10 @@ function sendTxt(data) {  ///////// TODO Should be replaced by using sendMsg(txt
  * @param minFileSizeByte The size of the sent video should be more then the given minimal size in bytes
  */
 function sendVideo(data, minFileSizeByte) {
+    debug("Sending video message")
     if(data.name === mediaMsgType()) {
         const size = statSync(data.path).size
+        debug(`Sending video ${data.path} : ${size}`)
         if(size > minFileSizeByte) {
             if(size < videoMaxSize) {
                 bot.sendVideoNote(chatID, data.path)
@@ -200,6 +215,9 @@ function initBot() {
             bot = new api(token, {polling: true})
         else
             throw new Error("There is no Telegram bot API token found")
+        if(!chatID) {
+            chatID = initChatID()
+        }
     }
 }
 
@@ -208,9 +226,7 @@ function initBot() {
  * @param {Object} data Object containing name of the sent data and paths of images {@link sent_data}
  */
 function sendDetections(data) {
-    if (bot == null) initBot()              ///// TODO The case of still bot === null should be fixed
-    if (chatID == null)
-        chatID = process.env.TELEGRAM_BOT_CHAT
+    if (!bot) initBot()              ///// TODO The case of still bot === null should be fixed
 
     const actions = {
         [sent_data.types.IMAGES.name]: () => { sendPics(data) },

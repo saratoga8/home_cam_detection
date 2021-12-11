@@ -123,7 +123,7 @@ const getChatID = async (name) => {
     const names = await Promise.all(
         ids.map(async id => await getChatName(id))
     )
-    expect(names, `There is no chat with the name '${name}'`).includes(name)
+    expect(names, `There is no chat with the name '${name}' between '${names}'`).includes(name)
     const ind = names.findIndex(curName => curName === name)
     return ids[ind]
 }

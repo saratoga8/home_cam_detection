@@ -4,10 +4,9 @@ const expect = chai.expect
 const { clrDir, storeResources, restoreResources, detectionsDirPath } = require('../utils')
 const { chkChatClearing, runTelegram, sendAndReceiveTxtMsg, chkDetections, setTelegramBotToken, stopTelegram} = require("./connection")
 
-const chatName = 'Home camera'
+const chatName = 'home_cam'
 
 const beforeEachCommon = async () => {
-    expect(process.env.TAAS_KEY, "There is no TAAS key").not.undefined
     await chkChatClearing(chatName)
 }
 
@@ -16,8 +15,8 @@ const testCommand = async (commandTxt, expectedAnswer, chatName, timeOut = 3000)
     expect([ expectedAnswer, commandTxt ], "The sent command or response is invalid").eql(txts)
 }
 
-const beforeCommon = () => {
-    clrDir(detectionsDirPath)
+const beforeCommon = async () => {
+    await clrDir(detectionsDirPath)
 
     const storedResourcesPath = storeResources()
     setTelegramBotToken()
@@ -26,23 +25,26 @@ const beforeCommon = () => {
 
 describe('Sending detections and managing via Telegram', function () {
     let storedResourcesPath
-    let emitter
 
     this.timeout(10000)
 
     after(() => {
         restoreResources(storedResourcesPath)
-        stopTelegram(emitter)
     })
 
     before(async () => {
-        storedResourcesPath = beforeCommon()
-        emitter = runTelegram()
+        expect(process.env.TAAS_KEY, "There is no TAAS key").not.undefined
+        storedResourcesPath = await beforeCommon()
     })
 
     beforeEach(async () => await beforeEachCommon())
 
     context('Sending commands', () => {
+        let emitter
+
+        before(() => { emitter = runTelegram() })
+        after(() => { stopTelegram(emitter) })
+
         const commandTests = [
             { cmd: 'hello', expectedAnswer: 'hello' },
             { cmd: 'bla-bla', expectedAnswer: `Unknown command bla-bla` }
@@ -56,13 +58,13 @@ describe('Sending detections and managing via Telegram', function () {
 
     context('Sending detections', () => {
         const detectionsTests = [
-            { type: 'video' },
-//            { type: 'image' }
+            { type: 'image' },
+            { type: 'video' }
         ]
 
         detectionsTests.forEach(({type}) => {
             const title = `Get ${type} detections`
-            it(title, async () => await chkDetections(type, chatName))
+            it(title, async () => await chkDetections(type, chatName))   /////////////// SHOULD BE EXTRACTED CONTROLLER AND DETECTIONS TO BEFORE/AFTER HOOK
         })
     })
 })
