@@ -28,6 +28,7 @@ describe('Controller', () => {
     after(async function ()  {
         setMotionPath(motionPath)
         stopEmulator()
+        emitter.removeAllListeners()
     })
     afterEach(function ()  {
         controller.stop(emitter)

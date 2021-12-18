@@ -10,7 +10,7 @@ const EventEmitter = require("events");
 
 const fs = require('fs')
 
-const emitter = new EventEmitter()
+
 const {addImgFiles, maxSavedImgs, detectionsDirPath, newImgsThreshHold, sleepMs} = require('./utils')
 
 const spies = require('chai-spies')
@@ -22,7 +22,10 @@ const { finishedVideoNotificationsDirPath } = require('../src/detections')
 const tmpFilePath = `${finishedVideoNotificationsDirPath}/video.finished`
 
 describe('Detections use', async () => {
+    let emitter
+
     beforeEach( () => {
+        emitter = new EventEmitter()
         if(fs.existsSync(detectionsDirPath))
             fs.rmdirSync(detectionsDirPath, {recursive: true})
         if(fs.existsSync(tmpFilePath))
@@ -34,6 +37,7 @@ describe('Detections use', async () => {
     afterEach(function ()  {
         controller.stop(emitter)
         detections.stop()
+        emitter.removeAllListeners()
         chai.spy.restore(io.ios.CLI.out)
     })
 
