@@ -248,7 +248,10 @@ exports.io = {
             initBot()
             receiveBotMsg(emitter)
             receiveBotErr()
-            emitter.on('close', () => {process.exit(0)})
+            emitter.on('close', () => {
+                debug('Stopping bot')
+                bot.removeAllListeners()
+            })
         }
     }
 }

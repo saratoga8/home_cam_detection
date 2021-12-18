@@ -163,7 +163,7 @@ function stop() {
  * Cleaning detections directory
  * @param {{ exceptFilePath: string }} options Options of deleting files: exception to deleting
  */
-function cleanDetectionsDir(options) {
+function cleanDetectionsDir(options= undefined) {
     debug('Clean detections directory')
     const exceptFilePath = options?.exceptFilePath
     delFiles({ extension: imgExt, maxSavedFiles: conf.max_saved_imgs, exceptFilePath})

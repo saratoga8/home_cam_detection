@@ -9,6 +9,7 @@
     "test": "npm run test:base && npm run test:telegram",
     "test:base": "mocha test/*.js --exit",
     "test:telegram": "mocha test/telegram/*.js --exit",
+    "test:telegram:video": "mocha test/telegram/telegram_video.js --exit",
     "cucumber": "cucumber-js features/motion.feature"
   },
   "repository": {
