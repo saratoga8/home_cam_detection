@@ -1,6 +1,9 @@
 const chai = require('chai')
 const expect = chai.expect
 
+const { execFileSync  } = require('child_process')
+
+const killNodeProcPath = 'test/resources/kill_node.sh'
 
 const { clrDir, storeResources, restoreResources, detectionsDirPath } = require('../utils')
 const { chkChatClearing, chkDetections, setTelegramBotToken, stopTelegram,
@@ -36,9 +39,9 @@ describe('Sending video detections', function () {
     })
 
     before(async () => {
+        execFileSync(killNodeProcPath)
         expect(process.env.TAAS_KEY, "There is no TAAS key").not.undefined
         storedResourcesPath = await beforeCommon()
-        emitter = runTelegramWithDetections()
     })
 
     beforeEach(async () => {
@@ -48,6 +51,7 @@ describe('Sending video detections', function () {
     it ('Sending video', async () => {
         const type = 'video'
         saveMediaType(type)
+        emitter = runTelegramWithDetections()
         await chkDetections(type, chatName)
     })
 })

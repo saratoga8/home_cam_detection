@@ -1,6 +1,7 @@
 const chai = require('chai')
 const expect = chai.expect
 
+const { execFileSync  } = require('child_process')
 
 const { clrDir, storeResources, restoreResources, detectionsDirPath } = require('../utils')
 const { chkChatClearing, runTelegramWithoutDetections, sendAndReceiveTxtMsg, chkDetections, setTelegramBotToken, stopTelegram,
@@ -9,6 +10,8 @@ const { chkChatClearing, runTelegramWithoutDetections, sendAndReceiveTxtMsg, chk
 } = require("./connection")
 
 const chatName = 'home_cam'
+
+const killNodeProcPath = 'test/resources/kill_node.sh'
 
 const beforeEachCommon = async () => {
     await chkChatClearing(chatName)
@@ -26,72 +29,6 @@ const beforeCommon = async () => {
     setTelegramBotToken()
     return storedResourcesPath
 }
-
-// describe('Sending detections and managing via Telegram', function () {
-//     let storedResourcesPath
-//
-//     this.timeout(10000)
-//
-//     after(() => {
-//         console.log("after")
-//         restoreResources(storedResourcesPath)
-//     })
-//
-//     before(async () => {
-//         console.log("before")
-//         expect(process.env.TAAS_KEY, "There is no TAAS key").not.undefined
-//         storedResourcesPath = await beforeCommon()
-//     })
-//
-//     beforeEach(async () => {
-//         throw Error("bla")
-//         await beforeEachCommon()
-//     })
-//
-//     context('Sending commands', () => {
-//         let emitter
-//
-//         before(() => {
-//             console.log("before sending")
-//             emitter = runTelegramWithoutDetections()
-//         })
-//         after(() => {
-//             console.log("after sending")
-//             stopTelegram(emitter)
-//         })
-//
-//         const commandTests = [
-//             { cmd: 'hello', expectedAnswer: 'hello' },
-//             { cmd: 'bla-bla', expectedAnswer: `Unknown command bla-bla` }
-//         ]
-//
-//         commandTests.forEach(({cmd, expectedAnswer}) => {
-//             // const title = `User sends '${cmd}' command`
-//             // it(title, async () => await testCommand(cmd, expectedAnswer, chatName))
-//             console.log("here")
-//         })
-//     })
-//
-//     context('Sending detections', () => {
-//         let emitter
-//         const detectionsTests = [
-//             { type: 'image' },
-//             { type: 'video' }
-//         ]
-//
-//         after(() => {
-//             stopTelegram(emitter)
-//         })
-//
-//         detectionsTests.forEach(({type}) => {
-//             console.log("Here")
-//             saveMediaType(type)
-//             emitter = runTelegramWithDetections()
-//             // const title = `Get ${type} detections`
-//             // it(title, async () => await chkDetections(type, chatName))
-//         })
-//     })
-// })
 
 describe('Sending commands', function () {
     this.timeout(10000)
@@ -139,6 +76,7 @@ describe('Sending image detections', function () {
     })
 
     before(async () => {
+        execFileSync(killNodeProcPath)
         expect(process.env.TAAS_KEY, "There is no TAAS key").not.undefined
         storedResourcesPath = await beforeCommon()
         emitter = runTelegramWithDetections()
