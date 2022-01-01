@@ -5,6 +5,7 @@ const { tmpdir } = require('os')
 const { copySync, removeSync } = require('fs-extra')
 const { waitUntil } = require('async-wait-until')
 
+const { debug } = require('../src/logger/logger')
 
 const chai = require('chai')
 const assert = chai.assert
@@ -49,6 +50,7 @@ exports.sleepMs = async (ms) => new Promise(resolve => setTimeout(resolve, ms))
  * @return {string} The path of the directory with the stored resources
  */
 exports.storeResources = () => {
+    debug('Storing resources')
     const dirPath = fs.mkdtempSync(join(tmpdir(), "resources"), "utf8")
     copySync(resolve('resources'), dirPath)
     return dirPath
@@ -64,6 +66,7 @@ exports.restoreResources = (fromPath) => {
 }
 
 exports.clrDir = async (dirPath) => {
+    debug(`Clearing ${dirPath}`)
     fs.readdirSync(dirPath).map(name => `${dirPath}/${name}`).forEach(path => fs.rmSync(path))
 
     const isDirEmpty = () => fs.readdirSync(dirPath).length === 0

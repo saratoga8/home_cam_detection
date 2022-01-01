@@ -4,8 +4,9 @@
 name: Node.js CI
 
 on:
-  pull_request:
-    types: [ opened ]
+  push:
+    branches:
+      - "*"
 
 
 jobs:
@@ -28,5 +29,6 @@ jobs:
     - env:
         TAAS_KEY: ${{ secrets.TAAS_KEY }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      run: npm test
+        TELEGRAM_BOT_CHAT: ${{ secrets.TELEGRAM_BOT_CHAT }}
+      run: npm run test:base && npm run test:telegram && npm run test:telegram:video
     - run: npm run cucumber

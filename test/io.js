@@ -3,7 +3,7 @@ const chai = require('chai')
 chai.use(chaiHttp)
 const spies = require('chai-spies')
 const expect = chai.expect
-const assert = chai.assert
+
 
 const { copyFileSync } = require('fs')
 
@@ -21,13 +21,13 @@ const setBotTokenEnvVar = (val) => {
 
 describe('IO', () => {
     let storedResourcesPath
-    beforeEach(function () {
+    beforeEach(() => {
         storedResourcesPath = storeResources()
         chai.spy.on(io.ios.CLI.out, ['send'])
         chai.spy.on(io.ios.TELEGRAM.out, ['send'])
     })
 
-    afterEach(function () {
+    afterEach(() => {
         chai.spy.restore(io.ios.TELEGRAM.out)
         chai.spy.restore(io.ios.CLI.out)
         restoreResources(storedResourcesPath)
@@ -89,4 +89,5 @@ describe('IO', () => {
             expect(io.ios.TELEGRAM.out.send).to.have.been.called(1)
         })
     })
+
 })

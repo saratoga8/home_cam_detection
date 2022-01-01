@@ -107,7 +107,7 @@ const getChatName = async (id) => {
 
 const waitUntilMsgsSent = async (conditionFunc, errTxt, timeout) => {
     try {
-        await waitUntil(conditionFunc, { timeout })
+        await waitUntil(conditionFunc, { timeout, intervalBetweenAttempts: 1000 })
     } catch (e) {
         assert.fail(errTxt)
     }
@@ -123,7 +123,7 @@ const getChatID = async (name) => {
     const names = await Promise.all(
         ids.map(async id => await getChatName(id))
     )
-    expect(names, `There is no chat with the name '${name}'`).includes(name)
+    expect(names, `There is no chat with the name '${name}' between '${names}'`).includes(name)
     const ind = names.findIndex(curName => curName === name)
     return ids[ind]
 }
@@ -145,14 +145,23 @@ const clrChat = async (name) => {
 }
 
 
-exports.runTelegram = () => {
+exports.runTelegramWithoutDetections = () => {
     const emitter = new EventEmitter()
     controller.run(emitter, io.ios.TELEGRAM)
     io.ios.TELEGRAM.in.receive(emitter)
     return emitter
 }
 
+exports.runTelegramWithDetections = () => {
+    const emitter = new EventEmitter()
+    detections.start(emitter)
+    controller.run(emitter, io.ios.TELEGRAM)
+    io.ios.TELEGRAM.in.receive(emitter)
+    return emitter
+}
+
 exports.stopTelegram = (emitter) => {
+    detections.stop()
     controller.stop(emitter)
 }
 
@@ -180,6 +189,11 @@ exports.sendAndReceiveTxtMsg = async (msgTxt, timeout, chatName) => {
     return getTxtMsgs(msgs)
 }
 
+exports.saveMediaType = (type) => {
+    conf.telegram.msg_type = type
+    fs.writeFileSync(config_path, yaml.dump(conf), 'utf8')
+}
+
 /**
  * Check receiving detections chat
  * @param type {string} Type of detection (video/image)
@@ -187,13 +201,6 @@ exports.sendAndReceiveTxtMsg = async (msgTxt, timeout, chatName) => {
  * @return {Promise<void>}
  */
 exports.chkDetections = async (type, chatName) => {
-    conf.telegram.msg_type = type
-    fs.writeFileSync(config_path, yaml.dump(conf), 'utf8')
-
-    const emitter = new EventEmitter()
-    detections.start(emitter)
-    controller.run(emitter, io.ios.TELEGRAM)
-
     if (type === 'image')
         await addImagesDetections()
     else

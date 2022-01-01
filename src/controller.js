@@ -1,7 +1,7 @@
 const commands = require('./commands')
 const detections = require('./detections')
 const cli = require('./ios/cli')
-const {eventMsgSent} = require('./ios/io')
+const { eventMsgSent } = require('./ios/io')
 
 const { debug } = require('../src/logger/logger')
 
@@ -19,15 +19,9 @@ const executeCmd = (name, io) => {
  */
 function run(emitter, io = cli.io) {
     debug("Starting controller")
-    emitter.on("command", (data) => {
-        executeCmd(data.name, io)
-    })
-    emitter.on(detections.eventStr, (data) => {
-        io.out.send(data)
-    })
-    emitter.on(eventMsgSent, () => {
-        detections.cleanDir()
-    })
+    emitter.on("command", (data) => executeCmd(data.name, io))
+    emitter.on(detections.eventStr, (data) => io.out.send(data))
+    emitter.on(eventMsgSent, () => detections.cleanDir())
 }
 
 /**
@@ -36,9 +30,8 @@ function run(emitter, io = cli.io) {
  */
 function stop(emitter) {
     debug('Stopping controller')
-    emitter.removeAllListeners("command")
-    emitter.removeAllListeners(detections.eventStr)
-    emitter.removeAllListeners(eventMsgSent)
+    emitter.emit('close')
+//    emitter.removeAllListeners()
 }
 
 exports.run = run

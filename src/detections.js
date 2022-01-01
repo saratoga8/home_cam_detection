@@ -40,7 +40,7 @@ let lastDetectionDate = toNowSeconds()
  * Get threshold of new images of detections from configuration file
  * @returns {undefined|int} Threshold number or undefined
  */
-const newImgsThreshold = () => {
+const getNewImgsThreshold = () => {
     const conf = yaml.load(fs.readFileSync(config_path, 'utf8'))
     return (conf === undefined) ? undefined : conf.new_imgs_threshold
 }
@@ -57,13 +57,22 @@ function getFilePathsInDetectionsDir(fileExtension) {
         .map(file => detectionsDirPath.concat(sep, file))
 }
 
+/**
+ * Emit event with the paths of last images of detections
+ * @param {EventEmitter} emitter Event emitter instance
+ */
 function emitEventWithLastImgsPaths(emitter) {
     debug('Emit event of detection')
     const data = Object.create(sentData.types.IMAGES)
-    data.paths = sortPaths(getFilePathsInDetectionsDir(imgExt)).slice(0, count)
+    data.paths = sortPathsByBirthTime(getFilePathsInDetectionsDir(imgExt)).slice(0, count)
     emitter.emit(eventStr, data)
 }
 
+/**
+ * Processing of a new image of detection
+ * @param {EventEmitter} emitter Event emitter instance
+ * @param {string} filePath The path of the image
+ */
 function processImg(emitter, filePath) {
     if (filePath.endsWith(`.${imgExt}`)) {
         debug(`Processing image ${filePath}`)
@@ -72,31 +81,50 @@ function processImg(emitter, filePath) {
             lastDetectionDate = toNowSeconds()
             return
         }
-        const threshold = newImgsThreshold()
+        const threshold = getNewImgsThreshold()
         if (threshold && (count >= threshold)) {
             if(count === threshold) {
-                count++
                 emitEventWithLastImgsPaths(emitter)
+                count++
             }
             else {
                 count = 0
-                cleanDir()
+                cleanDetectionsDir()
             }
         } else count++
     }
 }
 
+/**
+ * Get path of the video with detection
+ * @return {string} Video's path
+ */
+function getPathOfCreatedVideo() {
+    const paths = getFilePathsInDetectionsDir(videoExt)
+    const ind = (paths.length > conf.max_saved_videos) ? conf.max_saved_videos - 1 : 0
+    return paths[ind]
+}
+
+/**
+ * Process a video of detection
+ * @param {EventEmitter} emitter Event emitter instance
+ * @param {string} filePath The video's path
+ */
 function processVideo(emitter, filePath) {
     if (filePath.endsWith('video.finished')) {
         debug('Processing video')
-        const path = sortPaths(getFilePathsInDetectionsDir(videoExt))[0]
+        const path = getPathOfCreatedVideo()
         const data = Object.create(sentData.types.VIDEO)
         data.path = path
         emitter.emit(eventStr, data)
-        cleanDir()
+        cleanDetectionsDir({ exceptFilePath: path })
     }
 }
 
+/**
+ * Create a directory with the given path
+ * @param {string} path Directory's path
+ */
 const createDir = (path) => {
     if(!fs.existsSync(path)) {
         fs.mkdirSync(path, { recursive: true })
@@ -133,35 +161,48 @@ function stop() {
 
 /**
  * Cleaning detections directory
+ * @param {{ exceptFilePath: string }} options Options of deleting files: exception to deleting
  */
-function cleanDir() {
+function cleanDetectionsDir(options= undefined) {
     debug('Clean detections directory')
-    delFiles(imgExt, conf.max_saved_imgs)
-    delFiles(videoExt, conf.max_saved_videos)
+    const exceptFilePath = options?.exceptFilePath
+    delFiles({ extension: imgExt, maxSavedFiles: conf.max_saved_imgs, exceptFilePath})
+    delFiles({ extension: videoExt, maxSavedFiles: conf.max_saved_videos, exceptFilePath})
 }
 
-function sortPaths(paths) {
+/**
+ * Sort the array of given paths
+ * @param {[string]} paths The array
+ * @return {[string]} The sorted array
+ */
+function sortPathsByBirthTime(paths) {
     const cmp = (path1, path2) => fs.statSync(path2).birthtimeMs - fs.statSync(path1).birthtimeMs
     return paths.sort(cmp)
 }
 
 /**
  * Deleting files with given extensions
- * @param fileExtension File extension
- * @param maxSavedFiles Number of latest files should be saved
+ * @param {{extension: string, maxSavedFiles: number, exceptFilePath: string}} info Information of the being deleted files: file extension, maximal saved files, excepted file path
  */
-function delFiles(fileExtension, maxSavedFiles) {
-    debug(`Deleting files *.${fileExtension}`)
-    const sorted = sortPaths(getFilePathsInDetectionsDir(fileExtension))
-    const delElementsNum = sorted.length - maxSavedFiles
-    if(delElementsNum > 0)
-        sorted.slice(sorted.length - delElementsNum).forEach(fs.unlinkSync)
+function delFiles(info) {
+    debug(`Deleting files *.${info.extension}`)
+    const sorted = sortPathsByBirthTime(getFilePathsInDetectionsDir(info.extension))
+    const delElementsNum = sorted.length - info.maxSavedFiles
+    if(delElementsNum > 0) {
+        sorted
+            .slice(sorted.length - delElementsNum)
+            .forEach(path => {
+                if (path !== info.exceptFilePath) {
+                    fs.unlinkSync(path)
+                }
+            })
+    }
 }
 
 /** Start detections */
 exports.start = start
 /** Cleaning directory of detections */
-exports.cleanDir = cleanDir
+exports.cleanDir = cleanDetectionsDir
 /** String of detections event */
 exports.eventStr = eventStr
 /** Path to the directory containing detections (videos/images) */
