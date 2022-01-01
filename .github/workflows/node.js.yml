@@ -28,5 +28,5 @@ jobs:
     - env:
         TAAS_KEY: ${{ secrets.TAAS_KEY }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      run: npm test
+      run: npm test:base && npm test:telegram && npm test:video
     - run: npm run cucumber
