@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@cucumber/cucumber": "^7.3.1",
-    "async-wait-until": "^2.0.9",
+    "async-wait-until": "2.0.9",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "chai-events": "^0.0.3",
