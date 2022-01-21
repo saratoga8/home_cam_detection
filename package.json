@@ -21,7 +21,7 @@
     "dotenv": "^10.0.0",
     "js-yaml": "^4.1.0",
     "jsdoc": "^3.6.7",
-    "log4js": "^6.3.0",
+    "log4js": "^6.4.0",
     "node-telegram-bot-api": "^0.56.0",
     "process": "^0.11.10",
     "stable": "^0.1.8",
