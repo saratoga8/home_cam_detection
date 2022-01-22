@@ -20,7 +20,7 @@
     "chokidar": "^3.5.2",
     "dotenv": "^10.0.0",
     "js-yaml": "^4.1.0",
-    "jsdoc": "^3.6.7",
+    "jsdoc": "^3.6.8",
     "log4js": "^6.4.0",
     "node-telegram-bot-api": "^0.56.0",
     "process": "^0.11.10",
