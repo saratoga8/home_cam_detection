@@ -1,0 +1,5 @@
+configuration:
+  # Timeout in seconds for each ping request
+  timeout_s: 1
+  # Exit after sending number of ECHO_REQUEST
+  min_reply: 2
