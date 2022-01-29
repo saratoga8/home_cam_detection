@@ -5,7 +5,7 @@ const chai = require('chai')
 const assert = chai.assert
 const expect = chai.expect
 chai.should()
-chai.use(require("chai-events"));
+chai.use(require("chai-events"))
 const EventEmitter = require("events");
 
 const fs = require('fs')

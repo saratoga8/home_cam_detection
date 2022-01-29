@@ -27,8 +27,7 @@
     "process": "^0.11.10",
     "stable": "^0.1.8",
     "yargs": "^17.2.1",
-    "ping": "^0.4.1",
-    "is-ip":"^4.0.0"
+    "ping": "^0.4.1"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^7.3.1",

@@ -3,9 +3,11 @@ const { readFileSync } = require('fs')
 const ping_lib = require('ping')
 const { setInterval } = require('timers')
 const yaml = require('js-yaml')
+const { isIP } = require('net')
 
 const { error, warn, debug } = require('../src/logger/logger')
 
+const eventStr = "host_state"
 
 
 /**
@@ -20,6 +22,22 @@ let running = false
  */
 function isRunning() {
     return running
+}
+
+/**
+ * Select valid IPs from the given IPs array
+ * @param ips {string[]} IPs array
+ * @return {string[]} the array of valid IPs
+ */
+function selectValidIps(ips) {
+    const condition = (ip) => {
+        if (!isIP(ip)) {
+            warn(`The IP ${ip} is not valid`)
+            return  false
+        }
+        return true
+    }
+    return ips.filter(condition)
 }
 
 /**
@@ -41,7 +59,7 @@ function getIpsFromFile(path) {
     } else {
         error(`The file ${path} doesn't exist`)
     }
-    return Object.freeze(ips)
+    return Object.freeze(selectValidIps(ips))
 }
 
 /**
@@ -79,16 +97,19 @@ function getPingConf(path) {
  * Monitor the reachability of the given IPs
  * @param ips {string[]} IPs array
  * @param path {string} path of the configuration file of ping
+ * @param emitter {EventEmitter} Event emitter instance
  */
-async function monitorIps(ips, path) {
+async function monitorIps(ips, path, emitter) {
     debug(`Monitoring ips: ${ips}`)
     const pingConfig = getPingConf(path)
     const intervalMs = (pingConfig.timeout * pingConfig.min_reply * 1000) * ips.length
     const intervalProc = setInterval(async () => {
-        const reachableIp = await getFirstReachableIp(ips, pingConfig)
-        if (reachableIp) {
-            debug(`The host ${reachableIp} is reachable`)
-            stop()
+        if (running) {
+            const reachableIp = await getFirstReachableIp(ips, pingConfig)
+            const state = reachableIp !== undefined
+            debug(`Reachable: ${state}`)
+            emitter.emit(eventStr, { reachable: state })
+        } else {
             clearInterval(intervalProc)
         }
     }, intervalMs)
@@ -111,14 +132,15 @@ async function getFirstReachableIp(ips, pingConfig) {
 /**
  * Start the service
  * @param paths { Object<string, string> } Paths of the file with IPs and file with the configuration of ping
+ * @param emitter {EventEmitter} Event emitter instance
  */
-async function start(paths) {
+async function start(paths, emitter) {
     debug('Starting ping')
     if (pathExistsSync(paths.ips)) {
         const ips = getIpsFromFile(paths.ips)
         if (ips.length !== 0) {
-            await monitorIps(ips, paths.conf)
             running = true
+            await monitorIps(ips, paths.conf, emitter)
         } else {
             running = false
             warn(`The file ${paths.ips} has no IPs`)
@@ -137,3 +159,4 @@ function stop() {
 exports.start = start
 exports.stop = stop
 exports.isRunning = isRunning
+exports.eventHostStateStr = eventStr

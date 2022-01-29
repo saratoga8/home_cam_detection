@@ -2,6 +2,7 @@ const commands = require('./commands')
 const detections = require('./detections')
 const cli = require('./ios/cli')
 const { eventMsgSent } = require('./ios/io')
+const { eventHostStateStr } = require('./ping')
 
 const { debug } = require('../src/logger/logger')
 
@@ -22,6 +23,10 @@ function run(emitter, io = cli.io) {
     emitter.on("command", (data) => executeCmd(data.name, io))
     emitter.on(detections.eventStr, (data) => io.out.send(data))
     emitter.on(eventMsgSent, () => detections.cleanDir())
+    emitter.on(eventHostStateStr, (host) => {
+        const cmd = host.reachable ? commands.stopMotion : commands.startMotion
+        executeCmd(cmd)
+    })
 }
 
 /**
