@@ -19,7 +19,7 @@ function hasInstalled() {
 }
 
 /**
- * Start motions detection
+ * Start the motions detection
  */
 function start () {
   try {
@@ -38,7 +38,7 @@ function start () {
 }
 
 /**
- * Stop motions detection
+ * Stop the motions detection
  */
 function stop() {
   if(childProcess) {

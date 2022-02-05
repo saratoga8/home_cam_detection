@@ -1,5 +1,5 @@
 const fs = require('fs')
-const {execSync} = require('child_process')
+const { execSync } = require('child_process')
 const yaml = require('js-yaml')
 const chai = require('chai')
 const assert = chai.assert

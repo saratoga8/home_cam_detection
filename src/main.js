@@ -5,6 +5,7 @@ process.env["NTBA_FIX_319"] = '1'
 const fs = require('fs')
 const controller = require('./controller')
 const detections = require('../src/detections')
+const ping = require('../src/ping')
 
 const args = require('yargs').argv
 const pid_path = args.pid_path
@@ -23,6 +24,7 @@ const stopOnKillSignal = () => {
         motion.stop()
         detections.stop()
         controller.stop(emitter)
+        ping.stop()
         debug("Exiting")
         process.exit()
     })
@@ -33,6 +35,8 @@ const startProgramParts = (io) => {
     motion.start()
     controller.run(emitter, io)
     io.in.receive(emitter)
+    const pingInfo = { ips: '../resources/ips.data', conf: '../resources/ping.yml' }
+    ping.start(pingInfo, emitter)
 }
 
 const saveProgramPID = () => {
