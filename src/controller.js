@@ -5,12 +5,15 @@ const { eventMsgSent } = require('./ios/io')
 const { eventHostStateStr } = require('./ping')
 
 const { debug } = require('../src/logger/logger')
+const {error} = require("./logger/logger");
 
 const executeCmd = (name, io) => {
     const command = commands.arr.find(command => command.command_name === name)
-    if (!command)
-        throw new Error(`Unknown command ${name}`)
-    command.exec(io)
+    if (!command) {
+        error(`Unknown command ${name}`)
+    } else {
+        command.exec(io)
+    }
 }
 
 /**
@@ -20,11 +23,12 @@ const executeCmd = (name, io) => {
  */
 function run(emitter, io = cli.io) {
     debug("Starting controller")
+
     emitter.on("command", (data) => executeCmd(data.name, io))
     emitter.on(detections.eventStr, (data) => io.out.send(data))
     emitter.on(eventMsgSent, () => detections.cleanDir())
     emitter.on(eventHostStateStr, (host) => {
-        const cmd = host.reachable ? commands.stopMotion : commands.startMotion
+        const cmd = host.reachable ? commands.stopMotion.command_name : commands.startMotion.command_name
         executeCmd(cmd)
     })
 }

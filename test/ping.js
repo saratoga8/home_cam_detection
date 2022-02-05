@@ -1,12 +1,14 @@
-const { statSync, mkdirSync, writeFileSync } = require('fs')
+const { rmSync, readFileSync, statSync, mkdirSync, writeFileSync } = require('fs')
 const { tmpdir } = require('os')
 const { join } = require('path')
 const { pathExistsSync } = require("fs-extra");
 const EventEmitter = require("events")
+const controller = require('../src/controller')
 
 const spies = require('chai-spies')
 const chai = require('chai'),
-    expect = chai.expect
+    expect = chai.expect,
+    assert = chai.assert
 chai.should()
 chai.use(require("chai-events"));
 chai.use(require('chai-fs'))
@@ -14,17 +16,33 @@ chai.use(spies)
 
 const ping = require('../src/ping')
 
-const {chkMotionState} = require("./motion_emulator");
+const { execSync } = require('child_process')
+
+const { setMotionPath, sleepMs} = require('./utils')
+const { stopEmulator, emulatorOutputFilePath, emulatorPath, chkMotionState } = require("./motion_emulator");
+const yaml = require('js-yaml')
+const config_path = 'resources/detections.yml'
+const conf = yaml.load(readFileSync(config_path, 'utf8'))
+const motionPath = conf.paths.motion
 
 
 
-
-function runReachableDevice() {
-
+function runReachableDevice(ip) {
+    try {
+        execSync(`test/resources/dummy_ip.sh create ${ip}`)
+    }
+    catch (error) {
+        assert.fail(`Cant create a dummy interface for ${ip}: ${error.stderr}`)
+    }
 }
 
 function stopReachableDevice() {
-
+    try {
+        execSync('test/resources/dummy_ip.sh delete')
+    }
+    catch (error) {
+        assert.fail(`Cant delete a dummy interface: ${error.stderr}`)
+    }
 }
 
 /**
@@ -59,6 +77,7 @@ const startPingWithIp = async (ip, tmpFileName, emitter) => {
 
 describe('Stop/Start detecting using ping of known devices', () => {
     let emitter = null
+    const ip = '192.168.1.13'
 
     beforeEach(() => emitter = new EventEmitter())
 
@@ -93,7 +112,7 @@ describe('Stop/Start detecting using ping of known devices', () => {
             expect(emptyFilePath, `There is no an empty file`).exist
             expect(statSync(emptyFilePath).size, `The file ${emptyFilePath} is not empty`).equals(3)
 
-            const paths = {ips: emptyFilePath, conf: 'resources/ping.yml'}
+            const paths = { ips: emptyFilePath, conf: 'resources/ping.yml' }
             await ping.start(paths, emitter)
 
             expect(ping.isRunning(), 'Ping service HAS started').is.false
@@ -122,7 +141,7 @@ describe('Stop/Start detecting using ping of known devices', () => {
 
         it('Ping an unreachable host', function () {
             const p = emitter.should.emit(ping.eventHostStateStr, { timeout: 6000 })
-            startPingWithIp('192.168.1.13', 'unreachable.data', emitter)
+            startPingWithIp(ip, 'unreachable.data', emitter)
             return p
         }).timeout(8000)
 
@@ -134,33 +153,64 @@ describe('Stop/Start detecting using ping of known devices', () => {
      })
 
     context('Switching states', () => {
-        it('UnReachable -> Reachable', () => {
-            const confFilePath = 'test/resources/unreachable.data'
-            ping.start(confFilePath)
-            expect(ping.isRunning(), 'Ping service has NOT started')
-            chkMotionState('started')
-            runReachableDevice()
-            chkMotionState('stopped')
+        after(() => {
+            setMotionPath(motionPath)
+            stopEmulator()
+        })
+        beforeEach(function ()  {
+            rmSync(emulatorOutputFilePath, { force: true })
+            setMotionPath(emulatorPath)
+            stopEmulator()
         })
 
-        it('Reachable -> UnReachable', () => {
-            runReachableDevice()
-            const confFilePath = 'test/resources/unreachable.data'
-            ping.start(confFilePath)
+        afterEach(() => {
+            controller.stop(emitter)
+        })
+
+        it('UnReachable -> Reachable', async () => {
+            try {
+                stopReachableDevice()
+                controller.run(emitter)
+                startPingWithIp(ip, 'unreachable.data', emitter)
+                expect(ping.isRunning(), 'Ping service has NOT started')
+                await sleepMs(5000)
+                chkMotionState('started')
+                runReachableDevice(ip)
+                await sleepMs(3000)
+                chkMotionState('stopped')
+            } catch (e) {
+                assert.fail(`Test stopped: ${e}`)
+            }
+        }).timeout(10000)
+
+        it('Reachable -> UnReachable', async () => {
+            try {
+                stopReachableDevice()
+                runReachableDevice(ip)
+                controller.run(emitter)
+                startPingWithIp(ip, 'reachable.data', emitter)
+                expect(ping.isRunning(), 'Ping service has NOT started')
+                await sleepMs(1000)
+                chkMotionState('stopped')
+                stopReachableDevice()
+                await sleepMs(5000)
+                chkMotionState('started')
+            } catch (e) {
+                assert.fail(`Test stopped: ${e}`)
+            }
+        }).timeout(10000)
+
+        it ('Stopping ping service', async () => {
+            runReachableDevice(ip)
+            controller.run(emitter)
+            startPingWithIp(ip, 'reachable.data', emitter)
             expect(ping.isRunning(), 'Ping service has NOT started')
+            await sleepMs(1000)
             chkMotionState('stopped')
+            ping.stop()
             stopReachableDevice()
-            chkMotionState('started')
-        })
-    })
-
-    context('Stopping ping service', () => {
-        runReachableDevice()
-        const confFilePath = 'test/resources/unreachable.data'
-        ping.start(confFilePath)
-        expect(ping.isRunning(), 'Ping service HAS started')
-        ping.stop()
-        stopReachableDevice()
-        chkMotionState('stopped')
+            await sleepMs(5000)
+            chkMotionState('stopped')
+        }).timeout(8000)
     })
 })
