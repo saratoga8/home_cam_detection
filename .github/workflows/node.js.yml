@@ -30,5 +30,9 @@ jobs:
         TAAS_KEY: ${{ secrets.TAAS_KEY }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_BOT_CHAT: ${{ secrets.TELEGRAM_BOT_CHAT }}
-      run: npm run test:base && sudo npm run test:ping && npm run test:telegram && npm run test:telegram:video
+      run: |
+      npm run test:base
+      sudo npm run test:ping
+      npm run test:telegram
+      npm run test:telegram:video
     - run: npm run cucumber
