@@ -32,8 +32,7 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_BOT_CHAT: ${{ secrets.TELEGRAM_BOT_CHAT }}
       run: |
-        yarn test:base
-        sudo yarn test:ping
         yarn test:telegram
         yarn test:telegram:video
+        yarn test:base
     - run: yarn cucumber

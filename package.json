@@ -10,7 +10,6 @@
     "test:base": "mocha test/*.js --exit",
     "test:telegram": "mocha test/telegram/telegram.js --exit",
     "test:telegram:video": "mocha test/telegram/telegram_video.js --exit",
-    "test:ping": "mocha test/ping.js --exit",
     "cucumber": "cucumber-js features/motion.feature"
   },
   "repository": {
