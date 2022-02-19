@@ -9,15 +9,17 @@ const {After, Before} = require('@cucumber/cucumber');
 const fs = require('fs')
 
 
-const detectionsConf = { path: 'resources/detections.yml', copyPath:  '/tmp/detections.yml'}
-const ioConf = { path: 'resources/io.yml', copyPath:  '/tmp/io.yml'}
+const backUpPaths = [
+    { from: 'resources/detections.yml', to:  '/tmp/detections.yml' },
+    { from: 'resources/io.yml', to:  '/tmp/io.yml' },
+    { from: 'resources/ips.data', to:  '/tmp/ips.data' }
+]
 
-const { stopEmulator, emulatorOutputFilePath, emulatorPath, chkMotionState } = require('../../test/motion_emulator')
+const { stopEmulator } = require('../../test/motion_emulator')
 
 Before(async function () {
     try {
-        fs.copyFileSync(detectionsConf.path, detectionsConf.copyPath)
-        fs.copyFileSync(ioConf.path, ioConf.copyPath)
+        backUpPaths.forEach(cur => fs.copyFileSync(cur.from, cur.to))
     }
     catch (e) {
         assert.fail(`Stopped because of error: ${e.stack}`)
@@ -26,8 +28,7 @@ Before(async function () {
 
 After(async function () {
     try {
-        fs.copyFileSync(detectionsConf.copyPath, detectionsConf.path)
-        fs.copyFileSync(ioConf.copyPath, ioConf.path)
+        backUpPaths.forEach(cur => fs.copyFileSync(cur.to, cur.from))
         if (this.childProc ) {
             this.childProc.kill('SIGTERM')
         }
