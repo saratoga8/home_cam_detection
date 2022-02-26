@@ -1,6 +1,4 @@
-const { rmSync, readFileSync, statSync, mkdirSync, writeFileSync } = require('fs')
-const { tmpdir } = require('os')
-const { join } = require('path')
+const { rmSync, readFileSync, statSync } = require('fs')
 const { pathExistsSync } = require("fs-extra");
 const EventEmitter = require("events")
 const controller = require('../src/controller')
@@ -16,9 +14,9 @@ chai.use(spies)
 
 const ping = require('../src/ping')
 
-const { execSync } = require('child_process')
 
-const { setMotionPath, sleepMs} = require('./utils')
+
+const { setMotionPath, sleepMs, createTmpFile, setDeviceState } = require('./utils')
 const { stopEmulator, emulatorOutputFilePath, emulatorPath, chkMotionState } = require("./motion_emulator");
 const yaml = require('js-yaml')
 const config_path = 'resources/detections.yml'
@@ -27,39 +25,6 @@ const motionPath = conf.paths.motion
 
 
 
-function runReachableDevice(ip) {
-    try {
-        execSync(`test/resources/dummy_ip.sh create ${ip}`)
-    }
-    catch (error) {
-        assert.fail(`Cant create a dummy interface for ${ip}: ${error.stderr}`)
-    }
-}
-
-function stopReachableDevice() {
-    try {
-        execSync('test/resources/dummy_ip.sh delete')
-    }
-    catch (error) {
-        assert.fail(`Cant delete a dummy interface: ${error.stderr}`)
-    }
-}
-
-/**
- * Create temporary file with text or empty
- * @param name {string} - File name
- * @param txt {string|''} - Text
- * @return {string} - File's path
- */
-function createTmpFile(name, txt = '') {
-    const dirPath = join(tmpdir(), "ping")
-    if (!pathExistsSync(dirPath)) {
-        mkdirSync(dirPath)
-    }
-    const filePath = join(dirPath, name)
-    writeFileSync(filePath, txt, "utf8")
-    return filePath
-}
 
 /**
  * Start ping monitoring an IP
@@ -169,13 +134,13 @@ describe('Stop/Start detecting using ping of known devices', () => {
 
         it('UnReachable -> Reachable', async () => {
             try {
-                stopReachableDevice()
+                setDeviceState({ reachable: false })
                 controller.run(emitter)
                 startPingWithIp(ip, 'unreachable.data', emitter)
                 expect(ping.isRunning(), 'Ping service has NOT started')
                 await sleepMs(5000)
                 chkMotionState('started')
-                runReachableDevice(ip)
+                setDeviceState({reachable: true}, ip)
                 await sleepMs(3000)
                 chkMotionState('stopped')
             } catch (e) {
@@ -185,14 +150,14 @@ describe('Stop/Start detecting using ping of known devices', () => {
 
         it('Reachable -> UnReachable', async () => {
             try {
-                stopReachableDevice()
-                runReachableDevice(ip)
+                setDeviceState({ reachable: false })
+                setDeviceState({ reachable: true }, ip)
                 controller.run(emitter)
                 startPingWithIp(ip, 'reachable.data', emitter)
                 expect(ping.isRunning(), 'Ping service has NOT started')
                 await sleepMs(1000)
                 chkMotionState('stopped')
-                stopReachableDevice()
+                setDeviceState({ reachable: false })
                 await sleepMs(5000)
                 chkMotionState('started')
             } catch (e) {
@@ -201,14 +166,14 @@ describe('Stop/Start detecting using ping of known devices', () => {
         }).timeout(10000)
 
         it ('Stopping ping service', async () => {
-            runReachableDevice(ip)
+            setDeviceState({ reachable: true }, ip)
             controller.run(emitter)
             startPingWithIp(ip, 'reachable.data', emitter)
             expect(ping.isRunning(), 'Ping service has NOT started')
             await sleepMs(1000)
             chkMotionState('stopped')
             ping.stop()
-            stopReachableDevice()
+            setDeviceState({ reachable: false })
             await sleepMs(5000)
             chkMotionState('stopped')
         }).timeout(8000)

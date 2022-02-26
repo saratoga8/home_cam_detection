@@ -1,9 +1,12 @@
 const { join, resolve, sep } = require('path')
 const yaml = require('js-yaml')
 const fs = require('fs')
-const { tmpdir } = require('os')
-const { copySync, removeSync } = require('fs-extra')
+const { pathExistsSync, copySync, removeSync } = require('fs-extra')
 const { waitUntil } = require('async-wait-until')
+
+const { tmpdir } = require('os')
+
+const { execSync } = require('child_process')
 
 const { debug } = require('../src/logger/logger')
 
@@ -75,5 +78,37 @@ exports.clrDir = async (dirPath) => {
     } catch (e) {
         assert.fail(`Directory ${dirPath} hasn't cleared`)
     }
+}
+
+/**
+ * Set a device with the given IP to the un/reachable state
+ * @param state {Object.<string, boolean>} State: { reachable: false/true }
+ * @param ip {string|undefined} IP of the device
+ */
+exports.setDeviceState = (state, ip = undefined) => {
+    const operation = state.reachable ? 'create' : 'delete'
+    const suffix = state.reachable ? ` ${ip}` : ''
+    try {
+        execSync(`test/resources/dummy_ip.sh ${operation}${suffix}`)
+    }
+    catch (error) {
+        assert.fail(`Cant ${operation} a dummy interface: ${error.stderr}`)
+    }
+}
+
+/**
+ * Create temporary file with text or empty
+ * @param name {string} - File name
+ * @param txt {string|''} - Text
+ * @return {string} - File's path
+ */
+exports.createTmpFile = (name, txt = '') => {
+    const dirPath = join(tmpdir(), "ping")
+    if (!pathExistsSync(dirPath)) {
+        fs.mkdirSync(dirPath)
+    }
+    const filePath = join(dirPath, name)
+    fs.writeFileSync(filePath, txt, "utf8")
+    return filePath
 }
 
