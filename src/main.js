@@ -35,7 +35,7 @@ const startProgramParts = (io) => {
     motion.start()
     controller.run(emitter, io)
     io.in.receive(emitter)
-    const pingInfo = { ips: '../resources/ips.data', conf: '../resources/ping.yml' }
+    const pingInfo = { ips: 'resources/ips.data', conf: 'resources/ping.yml' }
     ping.start(pingInfo, emitter)
 }
 

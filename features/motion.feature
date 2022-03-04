@@ -16,7 +16,6 @@ Feature: Motion detecting by program
       | DOES    | more |
       | DOESN'T | less |
 
-    @current
   Scenario: User stops motion detecting
     And There are detections with number more than threshold
     And Program DOES detect motion

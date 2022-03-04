@@ -96,12 +96,12 @@ function getPingConf(path) {
 /**
  * Monitor the reachability of the given IPs
  * @param ips {string[]} IPs array
- * @param path {string} path of the configuration file of ping
+ * @param confPath {string} path of the configuration file of ping
  * @param emitter {EventEmitter} Event emitter instance
  */
-async function monitorIps(ips, path, emitter) {
+async function monitorIps(ips, confPath, emitter) {
     debug(`Monitoring ips: ${ips}`)
-    const pingConfig = getPingConf(path)
+    const pingConfig = getPingConf(confPath)
     const intervalMs = (pingConfig.timeout * pingConfig.min_reply * 1000) * ips.length
     const intervalProc = setInterval(async () => {
         if (running) {

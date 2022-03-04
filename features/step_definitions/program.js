@@ -2,7 +2,6 @@
 
 const {spawn} = require('child_process')
 const chai = require('chai')
-const assert = chai.assert
 const expect = chai.expect
 chai.use(require('chai-fs'))
 
@@ -56,14 +55,12 @@ When(/^User starts program with io (CLI|TELEGRAM)$/, function (io) {
     this.childProc.stdin.pipe(process.stdin)
 })
 
-When('Sleep {int}s', async function (seconds) {
+When('Sleep {int}s', { timeout: 30000 }, async function (seconds) {
     await sleepMs(seconds * 1000)
-});
+})
 
 
-Then(/^The motion has (started|stopped)$/, async function (state) {
-    if(state !== 'started') {
-        assert.fail("The step for the state hasn't implemented")
-    }
-    expect(file(emulatorOutputFilePath)).includes('Motion started')
+Then(/^The motion has (started|stopped)$/, function (state) {
+    const expectedStr = (state === 'stopped') ? "Motion's emulator has stopped" : 'Motion started'
+    expect(file(emulatorOutputFilePath)).includes(expectedStr)
 })
