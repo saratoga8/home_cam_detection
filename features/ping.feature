@@ -11,7 +11,7 @@ Feature: Start/Stop motions detection when a defined device of user is unreachab
     Examples:
       | device_state | motion_state |
       | reachable    | stopped      |
- #     | unreachable  | started      |
+      | unreachable  | started      |
 
   Scenario Outline: Motion detections starts/stopped with the dependency on the changing state of user's device
     Given user has one defined device

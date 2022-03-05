@@ -18,7 +18,7 @@ Given('user has one defined device', function () {
 })
 
 Given(/^(some |)user's device is (reachable|unreachable)$/, function (some, state) {
-    if(some === '') {
+    if(!some) {
         if (state === 'reachable')
             setDeviceState({ reachable: true }, ip)
         else {
